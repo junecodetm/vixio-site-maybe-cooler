@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /.firecrawl/
+Disallow: /docs/
+
+Sitemap: https://www.vixio.com/sitemap.xml

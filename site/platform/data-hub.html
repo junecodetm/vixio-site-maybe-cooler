@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Hub — Vixio Platform</title>
+<meta name="description" content="4m+ structured datapoints on markets, authorities, licences, and regulatory activity — API and export ready.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<div class="container"><div class="breadcrumb"><a href="../../index.html">Home</a> <span class="sep">/</span> <a href="index.html">Platform</a> <span class="sep">/</span> Data Hub</div></div>
+
+<section class="hero hero-dark" style="padding-top: clamp(32px, 5vw, 64px);">
+  <div class="hero-particles"><span></span><span></span><span></span></div>
+  <div class="container">
+    <div class="hero-split">
+      <div class="reveal">
+        <span class="eyebrow">Platform · Data Hub</span>
+        <h1>Regulated industries, <em>structured.</em></h1>
+        <p class="hero-sub">4m+ structured datapoints on markets, authorities, licensees, tax regimes, supervisory actions, and market activity. Query the UI, pull the API, pipe it into your warehouse.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-light" href="../about/contact.html">See the Hub <span class="arr">→</span></a>
+          <a class="btn btn-outline-light" href="index.html">Back to platform</a>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="dashboard">
+          <div class="dashboard-inner">
+            <div class="dashboard-chrome"><div class="dots"><span></span><span></span><span></span></div><div class="url">Data Hub · Operators by market</div><div style="width:54px"></div></div>
+            <div style="padding:18px; min-height:420px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+                <span class="chip brand" style="font-size:.7rem;">market = "Brazil"</span>
+                <span class="chip violet" style="font-size:.7rem;">sector = gambling</span>
+                <span class="chip mint" style="font-size:.7rem;">status = licensed</span>
+                <span class="chip" style="font-size:.7rem; background: rgba(255,255,255,.05); color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.1)">+ add filter</span>
+              </div>
+              <div style="background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); border-radius:10px;">
+                <div style="display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:8px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.08); font-family:var(--font-mono); font-size:.68rem; color:rgba(255,255,255,.4); letter-spacing:.12em; text-transform:uppercase;">
+                  <div>Operator</div><div>Licence</div><div>Issued</div><div>GGR (2025)</div>
+                </div>
+                <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:8px; padding:10px 14px; border-bottom:1px dashed rgba(255,255,255,.05); font-size:.8rem; color:rgba(255,255,255,.85);">
+                  <div>Bet365 Brasil Ltda.</div><div style="font-family:var(--font-mono); color:#A5B4FC;">BR-001-24</div><div style="color:rgba(255,255,255,.55); font-family:var(--font-mono);">2024-12</div><div style="color:#A7F3D0;">$412M</div>
+                </div>
+                <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:8px; padding:10px 14px; border-bottom:1px dashed rgba(255,255,255,.05); font-size:.8rem; color:rgba(255,255,255,.85);">
+                  <div>Superbet do Brasil</div><div style="font-family:var(--font-mono); color:#A5B4FC;">BR-018-24</div><div style="color:rgba(255,255,255,.55); font-family:var(--font-mono);">2024-12</div><div style="color:#A7F3D0;">$284M</div>
+                </div>
+                <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:8px; padding:10px 14px; border-bottom:1px dashed rgba(255,255,255,.05); font-size:.8rem; color:rgba(255,255,255,.85);">
+                  <div>Betano Brasil</div><div style="font-family:var(--font-mono); color:#A5B4FC;">BR-042-24</div><div style="color:rgba(255,255,255,.55); font-family:var(--font-mono);">2024-12</div><div style="color:#A7F3D0;">$261M</div>
+                </div>
+                <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:8px; padding:10px 14px; border-bottom:1px dashed rgba(255,255,255,.05); font-size:.8rem; color:rgba(255,255,255,.85);">
+                  <div>Estrela Bet</div><div style="font-family:var(--font-mono); color:#A5B4FC;">BR-067-24</div><div style="color:rgba(255,255,255,.55); font-family:var(--font-mono);">2024-12</div><div style="color:#FCD34D;">$118M</div>
+                </div>
+                <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:8px; padding:10px 14px; font-size:.8rem; color:rgba(255,255,255,.85);">
+                  <div>KTO Brasil</div><div style="font-family:var(--font-mono); color:#A5B4FC;">BR-091-24</div><div style="color:rgba(255,255,255,.55); font-family:var(--font-mono);">2025-01</div><div style="color:#FCD34D;">$96M</div>
+                </div>
+              </div>
+              <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+                <span style="padding:5px 12px; background:var(--brand-600); color:white; border-radius:8px; font-family:var(--font-mono); font-size:.72rem;">JSON</span>
+                <span style="padding:5px 12px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.7); border-radius:8px; font-family:var(--font-mono); font-size:.72rem;">CSV</span>
+                <span style="padding:5px 12px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.7); border-radius:8px; font-family:var(--font-mono); font-size:.72rem;">API</span>
+                <span style="margin-left:auto; color:rgba(255,255,255,.5); font-size:.72rem; font-family:var(--font-mono);">1,247 results</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow no-dot">What's inside</span><h2>Coverage across every table that matters.</h2></div>
+    <div class="cards cols-3 reveal reveal-stagger">
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18"/></svg></div><h3>Markets &amp; tax regimes</h3><p>GGR, licensing tax, reporting frequency, market size, population segmentation.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-4 9-8 10-4-1-8-5-8-10V6l8-4z"/></svg></div><h3>Licensees &amp; authorities</h3><p>Every licensee, every regulator, every material enforcement action.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><h3>Primary sources, linked</h3><p>Every datapoint cites the regulator filing it came from. Auditable by design.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-ink">
+  <div class="container">
+    <div class="section-head reveal" style="margin-bottom:48px">
+      <span class="eyebrow light no-dot">The numbers</span>
+      <h2>The deepest structured dataset in regulated industries.</h2>
+    </div>
+    <div class="stats reveal">
+      <div><div class="stat-num"><span data-count="4" data-suffix="M+">0</span></div><div class="stat-label">Aggregated datapoints</div></div>
+      <div><div class="stat-num"><span data-count="200" data-suffix="+">0</span></div><div class="stat-label">Jurisdictions covered</div></div>
+      <div><div class="stat-num"><span data-count="45" data-suffix="">0</span></div><div class="stat-label">Individual sources aggregated</div></div>
+      <div><div class="stat-num"><span data-count="1400" data-suffix="+">0</span></div><div class="stat-label">Regulatory authorities</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow no-dot">What Data Hub delivers</span>
+      <h2>Expert-curated analysis, not raw legal text.</h2>
+      <p>Every jurisdiction, every regulator, every material data point — pre-analysed by Vixio's 140+ experts and ready for your next decision.</p>
+    </div>
+    <div class="cards cols-3 reveal reveal-stagger">
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-4 9-8 10-4-1-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>Ready-to-use analysis</h3>
+        <p>Expert-curated regulatory analysis across sectors — not raw statutes you still have to parse.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <h3>4m+ verified datapoints</h3>
+        <p>Structured, citable, and traceable to the regulator filing each datapoint came from.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18"/></svg></div>
+        <h3>Instant comparison</h3>
+        <p>Jurisdiction-by-jurisdiction comparison on tax, licensing, reporting, supervisory posture — in one click.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z"/></svg></div>
+        <h3>Risk &amp; opportunity</h3>
+        <p>Identify risks and opportunities linked to regulatory change before competitors see them.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 20V4M7 16V10M11 20V6M15 14V8M19 20V12"/></svg></div>
+        <h3>Expansion planning</h3>
+        <p>Regional expansion forecasts with market sizing, competitive density, and regulatory pathway.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <h3>Regulator-ready reports</h3>
+        <p>Current, defensible report formats your regulator and audit team will accept without rework.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-alt">
+  <div class="container">
+    <div class="section-head reveal center">
+      <span class="eyebrow no-dot">Recognition</span>
+      <h2>Awarded twice in 2025.</h2>
+    </div>
+    <div class="quotes reveal">
+      <div class="quote-card">
+        <div class="chip brand mb-16">FinTech Breakthrough Awards 2025</div>
+        <blockquote>Best RegTech Platform — Vixio's data layer powers the insights operators and banks rely on daily.</blockquote>
+      </div>
+      <div class="quote-card">
+        <div class="chip violet mb-16">RegTech Insight Europe 2025</div>
+        <blockquote>Best Regulatory Intelligence Solution — for Vixio's combination of human expertise and AI-enhanced analysis.</blockquote>
+      </div>
+      <div class="quote-card">
+        <div class="chip mint mb-16">Customer attested</div>
+        <blockquote>"A one-stop shop for the analysis of our compliance and regulatory needs." — Jess Feil, VP Regulatory Affairs &amp; Compliance, OpenBet</blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal center">
+      <span class="eyebrow no-dot">FAQ</span>
+      <h2>Common questions about the Data Hub.</h2>
+    </div>
+    <div class="faq reveal">
+      <details class="faq-item"><summary>What's in the 4m+ datapoints?</summary><p>Markets and tax regimes (GGR, licensing tax, reporting frequency), licensees, authorities, supervisory actions, market activity, and expert analysis — all structured and queryable.</p></details>
+      <details class="faq-item"><summary>Is there an API?</summary><p>Yes. JSON and CSV exports plus a REST API for pushing data into your data warehouse or BI tool.</p></details>
+      <details class="faq-item"><summary>Which sectors are covered?</summary><p>Gambling (online operators, suppliers, PSPs, regulators, law firms) and Financial Services (payments, retail banking, digital assets).</p></details>
+      <details class="faq-item"><summary>How fresh is the data?</summary><p>Continuously updated. Material changes flow through within hours of publication by the relevant authority.</p></details>
+    </div>
+  </div>
+</section>
+
+<section><div class="container"><div class="cta-band reveal"><h2>Query the regulatory world.</h2><p>See live data on the markets, licensees, and frameworks your team tracks.</p><a class="btn btn-light" href="../about/contact.html">Request API access <span class="arr">→</span></a></div></div></section>
+
+<div id="site-footer"></div>
+<script src="../nav.js"></script>
+</body></html>

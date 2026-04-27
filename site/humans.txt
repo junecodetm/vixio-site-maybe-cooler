@@ -1,0 +1,11 @@
+/* TEAM */
+  Vixio — Regulatory Intelligence
+  Site: https://www.vixio.com
+  Contact: info@vixio.com
+  Location: London, UK · Washington DC, USA
+
+/* COLOPHON */
+  Technology: HTML5, CSS custom properties, vanilla JavaScript
+  Typography: IBM Plex Sans, IBM Plex Serif, IBM Plex Mono
+  Brand colors: Royal indigo #233485 · Teal #37B8CB · Sage #86C79C · Paper #F7F7F2
+  Founded: 2006

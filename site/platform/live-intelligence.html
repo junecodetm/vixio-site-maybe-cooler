@@ -1,0 +1,2633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Live Intelligence Console — Vixio</title>
+<meta name="description" content="Real-time regulatory enforcement and landscape intelligence across 36 jurisdictions and 1,400+ authorities. Vixio's live console for compliance teams." />
+<meta name="theme-color" content="#020617" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<style>
+  :root {
+    --bg-0: #020617;
+    --bg-1: #0b1220;
+    --bg-2: #ffffff;
+    --map-bg: #c8dcea;
+    --map-bg-top: #d6e5ef;
+    --line: rgba(148, 163, 184, 0.12);
+    --line-2: rgba(148, 163, 184, 0.22);
+    --text-0: #f8fafc;
+    --text-1: #cbd5e1;
+    --text-2: #94a3b8;
+    --text-3: #64748b;
+    --accent: #22d3ee;
+    --accent-2: #37B8CB;
+    --sev-high: #dc2626;
+    --sev-med:  #2563eb;
+    --sev-low:  #16a34a;
+    --muted-country: #a4bccf;
+    --ms-blue:  #00a4ef;
+    --ms-green: #7fba00;
+    --ms-red:   #f25022;
+    --ms-yellow:#ffb900;
+    --card-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.07);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: 'Fira Sans', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  body {
+    background:
+      radial-gradient(1100px 700px at 12% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, rgba(0, 164, 239, 0.08), transparent 55%),
+      radial-gradient(1200px 800px at 50% 110%, rgba(56, 189, 248, 0.06), transparent 60%),
+      var(--bg-0);
+  }
+
+  /* Subtle dot grid overlay — light dots visible against the deep-navy page */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: radial-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(ellipse at 50% 30%, #000 40%, transparent 80%);
+  }
+
+  .wrap {
+    position: relative; z-index: 1;
+    max-width: 1480px; margin: 0 auto;
+    padding: 28px 32px 64px;
+  }
+
+  /* ----- HEADER ----- */
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; padding: 18px 22px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(17, 26, 46, 0.72), rgba(11, 18, 32, 0.62));
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 30px 60px rgba(2,6,23,0.45);
+  }
+
+  .brand {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .brand-logo {
+    height: 32px; width: auto; display: block;
+  }
+  .brand-divider {
+    width: 1px; height: 28px; background: var(--line-2);
+  }
+  .brand-text { line-height: 1.15; }
+  .brand-text .b1 { font-size: 13px; font-weight: 600; letter-spacing: 0.4px; color: var(--text-0); }
+  .brand-text .b2 { font-size: 10px; font-weight: 500; color: var(--text-2); letter-spacing: 1.6px; text-transform: uppercase; margin-top: 4px; }
+
+  .header-mid {
+    flex: 1; text-align: center;
+  }
+  .header-mid h1 {
+    margin: 0; font-size: 14px; font-weight: 600; letter-spacing: 2.6px;
+    color: var(--text-0); text-transform: uppercase;
+  }
+  .header-mid .sub {
+    margin-top: 6px; font-size: 12px; color: var(--text-2); font-family: 'Fira Code', monospace; letter-spacing: 0.4px;
+  }
+
+  .client-tag {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 10px;
+    background: rgba(2, 6, 23, 0.5);
+    border: 1px solid var(--line-2);
+  }
+  .ms-grid {
+    width: 18px; height: 18px;
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px;
+  }
+  .ms-grid span { display: block; }
+  .ms-grid span:nth-child(1){ background: var(--ms-red); }
+  .ms-grid span:nth-child(2){ background: var(--ms-green); }
+  .ms-grid span:nth-child(3){ background: var(--ms-blue); }
+  .ms-grid span:nth-child(4){ background: var(--ms-yellow); }
+  .vx-mark {
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .vx-mark svg { width: 100%; height: 100%; display: block; }
+  .client-tag .lbl { font-size: 10px; color: var(--text-2); letter-spacing: 1.6px; text-transform: uppercase; }
+  .client-tag .val { font-size: 13px; font-weight: 600; color: var(--text-0); letter-spacing: 0.4px; }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
+    50%      { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.05); }
+  }
+
+  /* ----- KPI STRIP ----- */
+  .kpis {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin-top: 18px;
+  }
+  .kpi {
+    position: relative; overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px 18px;
+    background: linear-gradient(180deg, rgba(17,26,46,0.68), rgba(11,18,32,0.58));
+    backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: 0 20px 40px rgba(2,6,23,0.35);
+  }
+  .kpi::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.55;
+  }
+  .kpi .k-label {
+    font-size: 10px; letter-spacing: 1.8px; color: var(--text-2); text-transform: uppercase; font-weight: 600;
+  }
+  .kpi .k-val {
+    margin-top: 12px; font-family: 'Fira Code', monospace; font-weight: 600;
+    font-size: 32px; color: var(--text-0); letter-spacing: 0.5px;
+    text-shadow: 0 0 18px rgba(34,211,238,0.15);
+  }
+  .kpi .k-sub {
+    margin-top: 8px; font-size: 11.5px; color: var(--text-2);
+  }
+
+  /* ----- MAIN GRID ----- */
+  .grid-main {
+    display: grid; grid-template-columns: 1.55fr 1fr; gap: 16px;
+    margin-top: 16px;
+  }
+
+  .card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 18px 14px;
+    background: linear-gradient(180deg, rgba(17, 26, 46, 0.62), rgba(11, 18, 32, 0.54));
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: 0 20px 40px rgba(2,6,23,0.35);
+  }
+  .card-head {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+    padding-bottom: 12px; margin-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .card-title {
+    margin: 0; font-size: 14px; letter-spacing: 2.4px; text-transform: uppercase;
+    color: var(--text-0); font-weight: 700;
+  }
+  .card-sub {
+    margin-top: 4px; font-size: 11px; color: var(--text-2); font-family: 'Fira Code', monospace;
+  }
+  .card-meta { font-size: 10px; color: var(--text-2); font-family: 'Fira Code', monospace; letter-spacing: 0.6px; }
+
+  /* MAP */
+  #map-wrap {
+    position: relative; width: 100%; height: 480px;
+    border-radius: 10px;
+    background:
+      radial-gradient(800px 400px at 50% 100%, rgba(55,184,203,0.20), transparent 70%),
+      linear-gradient(180deg, var(--map-bg-top) 0%, var(--map-bg) 100%);
+    overflow: visible;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  #map { width: 100%; height: 100%; display: block; border-radius: 10px; overflow: hidden; }
+  .country { transition: fill 180ms ease, opacity 180ms ease, filter 180ms ease; }
+  .country.dim { fill: var(--muted-country); }
+  .country.bordered { stroke: rgba(15,23,42,0.28); stroke-width: 0.55; }
+  .country.tracked {
+    cursor: pointer;
+    stroke: rgba(255,255,255,0.9);
+    stroke-width: 0.7;
+    filter: drop-shadow(0 2px 5px rgba(15,23,42,0.22));
+  }
+  .country.tracked:hover { filter: brightness(1.12) drop-shadow(0 3px 10px rgba(15,23,42,0.38)); }
+  .graticule { fill: none; stroke: rgba(15,23,42,0.18); stroke-width: 0.6; }
+  .sphere   { fill: rgba(255,255,255,0.0); stroke: rgba(15,23,42,0.32); stroke-width: 0.8; }
+
+  /* Map reset button (visible only when zoomed) */
+  .map-reset-btn {
+    position: absolute; top: 12px; left: 12px; z-index: 6;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid var(--line-2);
+    color: var(--text-0);
+    font-family: 'Fira Sans', sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.4px; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.45), 0 0 0 1px rgba(34,211,238,0.20) inset;
+    transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+  }
+  .map-reset-btn.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .map-reset-btn:hover { background: rgba(15, 23, 42, 0.98); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(2,6,23,0.55), 0 0 0 1px rgba(34,211,238,0.35) inset; }
+  .map-reset-btn .arrow {
+    display: inline-block; width: 14px; height: 14px;
+    color: var(--accent);
+  }
+
+  /* Country detail panel (slides in when a country is clicked) */
+  .country-detail {
+    position: absolute; top: 12px; right: 12px; z-index: 6;
+    width: 310px;
+    display: flex; flex-direction: column;
+    background: rgba(15, 23, 42, 0.94);
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(2,6,23,0.55), 0 0 0 1px rgba(34,211,238,0.18) inset;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    padding: 14px;
+    opacity: 0; transform: translateX(12px); pointer-events: none;
+    transition: opacity 320ms ease, transform 320ms ease;
+  }
+  .country-detail.show { opacity: 1; transform: translateX(0); pointer-events: auto; }
+
+  /* Wide variant · header spans top, content splits into two columns
+     (left: metrics + summary, right: enforcement register). Used on Tab 01. */
+  .country-detail.wide {
+    width: 580px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "header header"
+      "left   right";
+    column-gap: 16px;
+    row-gap: 0;
+  }
+  .country-detail.wide .cd-header   { grid-area: header; }
+  .country-detail.wide .cd-col-left {
+    grid-area: left;
+    display: flex; flex-direction: column; min-width: 0;
+  }
+  .country-detail.wide .cd-col-right {
+    grid-area: right;
+    display: flex; flex-direction: column; min-width: 0;
+  }
+  /* Give the register header a matching underline so both columns feel parallel */
+  .country-detail.wide .cd-col-right .cd-list-header {
+    padding-bottom: 10px; margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cd-header {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    padding-bottom: 12px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cd-title { font-size: 17px; font-weight: 700; color: var(--text-0); letter-spacing: 0.2px; line-height: 1.15; }
+  .cd-sub { font-size: 11px; color: var(--text-2); font-family: 'Fira Code', monospace; margin-top: 5px; letter-spacing: 0.2px; }
+  .cd-close {
+    background: transparent; border: none; color: var(--text-2);
+    font-size: 22px; line-height: 1; cursor: pointer; padding: 2px 8px;
+    border-radius: 6px;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  .cd-close:hover { background: rgba(255,255,255,0.08); color: var(--text-0); }
+
+  .cd-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
+  .cd-metric {
+    background: rgba(255,255,255,0.05); border-radius: 8px; padding: 9px 10px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .cd-metric .m-l { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-2); font-weight: 600; }
+  .cd-metric .m-v { font-size: 13.5px; font-weight: 700; font-family: 'Fira Code', monospace; color: var(--text-0); }
+  .cd-metric .m-v.high { color: var(--sev-high); }
+  .cd-metric .m-v.med  { color: var(--sev-med); }
+  .cd-metric .m-v.low  { color: var(--sev-low); }
+
+  .cd-summary {
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    background: rgba(34, 211, 238, 0.06);
+    border: 1px solid rgba(34, 211, 238, 0.22);
+    border-left: 2px solid var(--accent);
+    border-radius: 8px;
+  }
+  .cd-summary-header {
+    font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 7px;
+  }
+  .cd-summary p {
+    margin: 0; font-size: 12px; line-height: 1.55; color: var(--text-1);
+  }
+  .cd-summary p strong { color: var(--text-0); font-weight: 600; }
+
+  .cd-list-header {
+    font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--text-2); font-weight: 700; margin-bottom: 8px;
+  }
+  .cd-actions {
+    list-style: none; margin: 0; padding: 0;
+  }
+  .cd-actions li {
+    padding: 10px 11px; margin-bottom: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .cd-actions li:last-child { margin-bottom: 0; }
+  .cd-actions .a-row1 { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .cd-actions .a-date { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--text-2); }
+  .cd-actions .a-regulator { font-family: 'Fira Code', monospace; font-size: 10.5px; color: var(--text-1); font-weight: 700; letter-spacing: 0.3px; }
+  .cd-actions .a-sev {
+    padding: 2px 7px; border-radius: 4px; font-family: 'Fira Code', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .cd-actions .a-sev.high { background: rgba(220,38,38,0.12); color: var(--sev-high); border: 1px solid rgba(220,38,38,0.30); }
+  .cd-actions .a-sev.med  { background: rgba(37,99,235,0.12); color: var(--sev-med); border: 1px solid rgba(37,99,235,0.30); }
+  .cd-actions .a-sev.low  { background: rgba(22,163,74,0.12); color: var(--sev-low); border: 1px solid rgba(22,163,74,0.30); }
+  .cd-actions .a-entity { font-size: 12.5px; font-weight: 600; color: var(--text-0); margin: 6px 0 4px; }
+  .cd-actions .a-row3 { display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 11px; color: var(--text-2); }
+  .cd-actions .a-penalty { font-family: 'Fira Code', monospace; color: var(--text-0); font-weight: 700; }
+  .cd-actions .a-penalty.zero { font-weight: 400; color: var(--text-3); font-style: italic; }
+
+  .legend-row {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    padding: 10px 4px 2px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-1); letter-spacing: 0.4px; }
+  .legend-swatch {
+    width: 14px; height: 14px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .legend-swatch.muted { background: var(--muted-country); }
+
+  .legend-scale {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ls-bar {
+    display: inline-block;
+    width: 240px; height: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: linear-gradient(90deg, #93c5fd 0%, #a88ad0 50%, #7f1d1d 100%);
+    box-shadow: 0 1px 2px rgba(2,6,23,0.35) inset;
+  }
+  .ls-num {
+    font-family: 'Fira Code', monospace; font-weight: 700;
+    font-size: 11.5px; color: var(--text-0); letter-spacing: 0.3px;
+    min-width: 32px; text-align: center;
+  }
+  .ls-cap {
+    font-size: 10px; letter-spacing: 1.1px;
+    color: var(--text-2); text-transform: uppercase; font-weight: 600;
+  }
+
+  /* BAR CHART */
+  #bar-wrap { width: 100%; height: 480px; position: relative; }
+  #bar-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .bar { cursor: pointer; transition: filter 180ms ease, opacity 180ms ease; }
+  .bar:hover { filter: brightness(1.25) drop-shadow(0 0 10px rgba(34,211,238,0.55)); }
+  .axis text { fill: var(--text-2); font-size: 10.5px; font-family: 'Fira Code', monospace; letter-spacing: 0.4px; }
+  .axis line, .axis path { stroke: var(--line); shape-rendering: crispEdges; }
+  .grid line { stroke: var(--line); stroke-dasharray: 2 4; }
+  .bar-label {
+    fill: #ffffff; font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 600;
+  }
+
+  /* TOOLTIP — kept dark for crisp overlay over the light surface */
+  .tt {
+    position: fixed; pointer-events: none; z-index: 50;
+    min-width: 220px; padding: 12px 14px;
+    background: rgba(15, 23, 42, 0.96);
+    border: 1px solid rgba(15,23,42,0.4);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 18px 40px rgba(15,23,42,0.25), 0 0 0 1px rgba(55,184,203,0.22) inset;
+    color: #f8fafc; font-size: 12px;
+    opacity: 0; transform: translateY(4px); transition: opacity 140ms ease, transform 140ms ease;
+  }
+  .tt.show { opacity: 1; transform: translateY(0); }
+  .tt .tt-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.3px;
+    padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+  .tt .tt-dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+  .tt .tt-row {
+    display: flex; justify-content: space-between; gap: 16px; margin-top: 6px;
+    font-family: 'Fira Code', monospace;
+  }
+  .tt .tt-row .l { color: #94a3b8; font-size: 10.5px; letter-spacing: 0.6px; text-transform: uppercase; }
+  .tt .tt-row .v { color: #f8fafc; font-weight: 600; font-size: 12px; }
+  .tt .tt-row .v.high { color: #f87171; }
+  .tt .tt-row .v.med  { color: #60a5fa; }
+  .tt .tt-row .v.low  { color: #4ade80; }
+
+  /* ANALYSIS */
+  .analysis {
+    margin-top: 16px;
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px;
+  }
+  .analysis-text h2 {
+    margin: 4px 0 12px; font-size: 12px; letter-spacing: 2.2px; color: var(--text-0);
+    text-transform: uppercase; font-weight: 600;
+  }
+  .analysis-text p {
+    margin: 10px 0; color: var(--text-1); font-size: 13.5px; line-height: 1.7;
+  }
+  .analysis-text .lead {
+    color: var(--text-0); font-size: 14.5px; line-height: 1.65; font-weight: 400;
+  }
+  .analysis-text strong { color: var(--text-0); font-weight: 600; }
+  .accent { color: var(--accent); font-weight: 600; }
+
+  .insights ul {
+    list-style: none; padding: 0; margin: 6px 0 0;
+  }
+  .insights li {
+    display: grid; grid-template-columns: 32px 1fr; gap: 14px; align-items: flex-start;
+    padding: 16px 0; border-bottom: 1px dashed var(--line);
+    font-size: 13.5px; color: var(--text-1); line-height: 1.6;
+  }
+  .insights li:last-child { border-bottom: none; }
+  .insights li .num {
+    font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 700;
+    color: var(--accent); border: 1px solid rgba(34,211,238,0.35); border-radius: 6px;
+    padding: 4px 0; text-align: center; margin-top: 1px;
+    background: rgba(34, 211, 238, 0.08);
+  }
+  .insights li b { color: var(--text-0); font-weight: 600; }
+
+  /* Recent actions table */
+  .recent { margin-top: 16px; }
+  .recent table { width: 100%; border-collapse: collapse; }
+  .recent th {
+    text-align: left; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--text-2); padding: 10px 12px; border-bottom: 1px solid var(--line);
+    font-weight: 700;
+  }
+  .recent td {
+    padding: 11px 12px; border-bottom: 1px solid var(--line);
+    font-size: 12.5px; color: var(--text-1); font-family: 'Fira Sans', sans-serif;
+  }
+  .recent tr:hover td { background: rgba(34, 211, 238, 0.05); }
+  .recent .cell-id { font-family: 'Fira Code', monospace; color: var(--text-2); font-size: 11.5px; }
+  .flag {
+    display: inline-block; margin-right: 8px; font-size: 15px; line-height: 1;
+    vertical-align: -2px; font-family: 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+  }
+  .cd-title .flag { font-size: 20px; margin-right: 10px; vertical-align: -3px; }
+  .recent .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 10.5px; font-family: 'Fira Code', monospace; font-weight: 600; letter-spacing: 0.4px;
+  }
+  .recent .pill.high { background: rgba(220,38,38,0.10); color: var(--sev-high); border: 1px solid rgba(220,38,38,0.30); }
+  .recent .pill.med  { background: rgba(37,99,235,0.10); color: var(--sev-med); border: 1px solid rgba(37,99,235,0.30); }
+  .recent .pill.low  { background: rgba(22,163,74,0.10); color: var(--sev-low); border: 1px solid rgba(22,163,74,0.30); }
+  .recent .num { font-family: 'Fira Code', monospace; color: var(--text-0); }
+
+  footer {
+    margin-top: 28px; display: flex; justify-content: space-between; align-items: center;
+    color: #94a3b8; font-size: 11px; font-family: 'Fira Code', monospace; letter-spacing: 0.5px;
+  }
+
+  /* Tabs navigation */
+  .tabs {
+    display: flex; gap: 6px; margin-top: 16px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(17, 26, 46, 0.55), rgba(11, 18, 32, 0.45));
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    width: fit-content;
+  }
+  .tab-btn {
+    appearance: none; border: none; cursor: pointer;
+    background: transparent;
+    color: var(--text-2);
+    font-family: 'Fira Sans', sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    padding: 10px 18px; border-radius: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+  }
+  .tab-btn:hover { color: var(--text-0); background: rgba(255,255,255,0.04); }
+  .tab-btn.active {
+    color: var(--text-0);
+    background: linear-gradient(180deg, rgba(34, 211, 238, 0.18), rgba(34, 211, 238, 0.08));
+    box-shadow: 0 0 0 1px rgba(34,211,238,0.35) inset, 0 8px 18px rgba(34,211,238,0.12);
+  }
+  .tab-btn .tab-num {
+    font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px;
+    color: var(--accent);
+    background: rgba(34, 211, 238, 0.10);
+    border: 1px solid rgba(34, 211, 238, 0.30);
+  }
+  .tab-btn.active .tab-num { background: rgba(34, 211, 238, 0.18); }
+
+  .tab-pane[hidden] { display: none; }
+  /* The global stylesheet applies `section { padding: clamp(48px,6vw,96px) 0 }`
+     for hero/marketing sections — but the dashboard's panels (.tab-pane,
+     .kpis, .grid-main, .analysis, .recent) are all <section>s by semantic
+     correctness, not hero blocks. Reset their padding so the dashboard
+     density is driven by each panel's own margin-top instead. */
+  .tab-pane { padding: 0; animation: fadeIn 280ms ease both; }
+  .tab-pane > section,
+  .tab-pane section.kpis,
+  .tab-pane section.grid-main,
+  .tab-pane section.analysis,
+  .tab-pane section.card { padding-top: 0; padding-bottom: 0; }
+  /* Restore the .card's own 18px internal padding (we only killed the
+     OUTSIDE section padding from the global rule) */
+  .tab-pane section.card { padding: 18px 18px 14px; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Payment scheme map — markers + count badges */
+  .scheme-country.tracked {
+    cursor: pointer;
+    fill: rgba(34, 211, 238, 0.55);
+    stroke: rgba(255,255,255,0.92);
+    stroke-width: 0.7;
+    transition: fill 180ms ease, opacity 180ms ease, filter 180ms ease;
+    filter: drop-shadow(0 2px 5px rgba(15,23,42,0.22));
+  }
+  .scheme-country.tracked:hover {
+    fill: rgba(34, 211, 238, 0.85);
+    filter: brightness(1.10) drop-shadow(0 3px 10px rgba(34,211,238,0.45));
+  }
+  .scheme-badge-bg {
+    fill: rgba(15, 23, 42, 0.92);
+    stroke: rgba(34, 211, 238, 0.55);
+    stroke-width: 1;
+    pointer-events: none;
+  }
+  .scheme-badge-text {
+    fill: var(--text-0);
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+  }
+
+  /* Stacked bar chart — digital vs cash */
+  .dc-legend {
+    display: flex; align-items: center; gap: 18px;
+    padding: 4px 4px 0;
+    font-size: 11px; color: var(--text-1); letter-spacing: 0.4px;
+  }
+  .dc-legend-swatch {
+    display: inline-block; width: 14px; height: 14px; border-radius: 4px;
+    margin-right: 8px; vertical-align: middle;
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  .dc-legend-swatch.digital { background: #22d3ee; box-shadow: 0 0 8px rgba(34,211,238,0.45); }
+  .dc-legend-swatch.cash    { background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.40); }
+  .dc-bar.digital { fill: url(#grad-digital); }
+  .dc-bar.cash    { fill: url(#grad-cash); }
+  .dc-bar { cursor: pointer; transition: filter 180ms ease; }
+  .dc-bar:hover { filter: brightness(1.15) drop-shadow(0 0 10px rgba(255,255,255,0.25)); }
+  .dc-region-label { fill: var(--text-1); font-size: 11.5px; font-family: 'Fira Sans', sans-serif; }
+  .dc-total-label  { fill: var(--text-0); font-size: 11px; font-family: 'Fira Code', monospace; font-weight: 700; }
+  .dc-pct-label    { fill: #ffffff; font-size: 10.5px; font-family: 'Fira Code', monospace; font-weight: 700; }
+
+  /* Region selector — sits above the Scheme Register table on Tab 02 */
+  .region-selector {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    padding: 14px 4px 16px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .region-btn {
+    appearance: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    color: var(--text-1);
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 140ms ease;
+  }
+  .region-btn:hover { color: var(--text-0); background: rgba(255,255,255,0.06); transform: translateY(-1px); }
+  .region-btn.active {
+    color: var(--text-0);
+    background: var(--region-bg, rgba(255,255,255,0.08));
+    border-color: var(--region-color, var(--accent));
+    box-shadow: 0 0 0 1px var(--region-color, var(--accent)) inset,
+                0 10px 22px rgba(2,6,23,0.45),
+                0 0 18px var(--region-bg, rgba(34,211,238,0.15));
+  }
+  .region-btn .region-dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--region-color, var(--accent));
+    box-shadow: 0 0 8px var(--region-color, var(--accent));
+  }
+  .region-btn .region-count {
+    font-family: 'Fira Code', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+    padding: 2px 7px; border-radius: 5px; margin-left: 4px;
+    background: rgba(255,255,255,0.06); color: var(--text-2);
+  }
+  .region-btn.active .region-count {
+    background: var(--region-color, var(--accent));
+    color: #0f172a;
+  }
+
+  /* Region-colored left edge on table rows, matching the selected region */
+  #scheme-register td.region-tag {
+    font-family: 'Fira Code', monospace;
+    font-weight: 600; letter-spacing: 0.3px;
+    font-size: 11px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .grid-main, .analysis { grid-template-columns: 1fr; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    #map-wrap, #bar-wrap { height: 420px; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 16px; }
+    header.top { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .header-mid { text-align: left; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpi .k-val { font-size: 22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot { animation: none; }
+    .country, .bar { transition: none; }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="top">
+    <div class="brand">
+      <img class="brand-logo" src="../assets/vixio-logo-white.svg" alt="Vixio Regulatory Intelligence" />
+      <div class="brand-divider" aria-hidden="true"></div>
+      <div class="brand-text">
+        <div class="b1">Live Intelligence Console</div>
+        <div class="b2">Regulatory Enforcement &amp; Landscape · Production Data</div>
+      </div>
+    </div>
+    <div class="header-mid">
+      <h1>Global Regulatory Intelligence — Live</h1>
+      <div class="sub">Enforcement actions &amp; jurisdictional landscape across 36 markets · 2025 — 2026</div>
+    </div>
+    <div class="client-tag" aria-label="Live production data feed">
+      <div class="vx-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" stroke="#37B8CB" />
+          <circle cx="12" cy="12" r="6" stroke="#86C79C" />
+          <circle cx="12" cy="12" r="2.4" fill="#86C79C" stroke="none" />
+        </svg>
+      </div>
+      <div>
+        <div class="lbl">Status</div>
+        <div class="val">Live · production data</div>
+      </div>
+      <div class="live-dot" aria-hidden="true" title="Live data"></div>
+    </div>
+  </header>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="tab-enforcement">
+      <span class="tab-num">01</span>
+      Regulatory Enforcement
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-ecosystem">
+      <span class="tab-num">02</span>
+      Regulatory Landscape
+    </button>
+  </nav>
+
+  <!-- ============ TAB 1 · ENFORCEMENT ACTIONS ============ -->
+  <section id="tab-enforcement" class="tab-pane active" role="tabpanel">
+
+  <!-- KPI STRIP -->
+  <section class="kpis" aria-label="Headline metrics">
+    <div class="kpi">
+      <div class="k-label">Total Enforcement Actions</div>
+      <div class="k-val" id="kpi-actions">22</div>
+      <div class="k-sub">Across 7 jurisdictions · Jan 2025 – Apr 2026</div>
+    </div>
+    <div class="kpi">
+      <div class="k-label">Aggregate Penalty Value</div>
+      <div class="k-val" id="kpi-penalty">$31.86M</div>
+      <div class="k-sub">USD-equivalent disclosed monetary penalties</div>
+    </div>
+    <div class="kpi">
+      <div class="k-label">Most Significant Jurisdiction to Monitor</div>
+      <div class="k-val" id="kpi-top" style="font-size:26px;">United States</div>
+      <div class="k-sub">5 enforcement actions · $15.0M in penalties · CFPB · OCC · SEC</div>
+    </div>
+  </section>
+
+  <!-- MAIN GRID -->
+  <section class="grid-main">
+
+    <!-- MAP -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Severity Map · By Jurisdiction</h2>
+          <div class="card-sub">Choropleth: average severity score · hover for detail · click a country to zoom in</div>
+        </div>
+        <div class="card-meta">SCORE 1 → 10</div>
+      </div>
+      <div id="map-wrap">
+        <svg id="map" role="img" aria-label="World map color-coded by enforcement severity score"></svg>
+        <button id="map-reset" class="map-reset-btn" aria-label="Reset map view">
+          <svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 12 L6 8 L10 4"/>
+          </svg>
+          Global View
+        </button>
+        <aside id="country-detail" class="country-detail" aria-live="polite"></aside>
+      </div>
+      <div class="legend-row" aria-label="Severity legend">
+        <div class="legend-scale" aria-label="Severity gradient — lighter blue is lower severity, darker red is higher severity">
+          <span class="ls-cap">Lower</span>
+          <span class="ls-num" id="legend-min">—</span>
+          <span class="ls-bar" id="legend-gradient-bar" aria-hidden="true"></span>
+          <span class="ls-num" id="legend-max">—</span>
+          <span class="ls-cap">Higher</span>
+        </div>
+        <div class="legend-item"><span class="legend-swatch muted"></span>Out of Scope</div>
+      </div>
+    </div>
+
+    <!-- BAR CHART -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Enforcement Volume · By Jurisdiction</h2>
+          <div class="card-sub">Total enforcement actions per country · hover for breakdown</div>
+        </div>
+        <div class="card-meta">N = 22 ACTIONS</div>
+      </div>
+      <div id="bar-wrap">
+        <svg id="bar-svg" role="img" aria-label="Bar chart of enforcement actions per country"></svg>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ANALYSIS -->
+  <section class="analysis">
+    <div class="card analysis-text">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Analyst Commentary</h2>
+          <div class="card-sub">Vixio strategic intelligence · payments resilience theme</div>
+        </div>
+        <div class="card-meta">Q2 2026 EDITION</div>
+      </div>
+      <p class="lead">
+        New Operational Resilience frameworks are being built
+        across the world, with the <span class="accent">Digital Operational Resilience Act (DORA)</span>
+        taking effect in the EU. Understanding where regulators are intervening — and which triggers
+        are repeatable across jurisdictions — is now table-stakes for any cross-border programme. With
+        DORA still maturing, the number of enforcement actions remains a leading rather than a lagging
+        indicator, but the trend across the world stage is unmistakable.
+      </p>
+      <p>
+        Globally there has been a sharp shift towards <strong>third-party scrutiny</strong>, with vendor
+        oversight being the recurring weakness in firms that have been penalised. The data collected
+        shows clearly that nations differ in <em>how</em> they enforce, even when they converge on
+        <em>what</em> they enforce. The 2025 dataset spans seven jurisdictions with functional
+        operational resilience frameworks: <strong>the US, the UK, Peru, Hong Kong, Australia, the UAE,
+        and South Africa</strong>.
+      </p>
+      <p>
+        In the <strong>United States</strong>, the severity score reaches <span class="accent">8.2</span>,
+        driven by total cumulative fines of <strong>$15,000,000 USD</strong> and a high tempo of
+        enforcement actions across fraud protection and third-party oversight. Compliance teams operating
+        in the US should treat internal controls and supply-chain mapping as a continuous discipline,
+        especially where client-facing software is in the critical path.
+      </p>
+      <p>
+        The <strong>UK</strong> faces similar barriers but with a different posture: it posts the
+        <strong>highest mean severity score globally</strong> on only three actions, an
+        <span class="accent">8.3</span> average. That reflects the FCA and Bank of England's preference
+        for a small number of high-impact, precedent-setting interventions — particularly around
+        third-party oversight failures and IT governance. Programmes targeting the UK should expect
+        fewer but heavier interventions, and plan governance evidence accordingly.
+      </p>
+      <p>
+        Across <strong>APAC</strong>, regulators are communicating actively about the issues
+        organisations face. <strong>Hong Kong</strong> sits at <span class="accent">7.75</span>, with
+        triggers concentrated in <em>cloud resilience, monitoring logic, database latency and
+        concurrent-load failures</em> — all infrastructure-level risks that translate directly into
+        platform and vendor obligations. <strong>Australia's</strong> regulators (ASIC, APRA, RBA) are
+        increasingly issuing non-monetary but structurally significant interventions — capital
+        add-ons, regulatory directions, court orders — signalling that <em>capital and licence
+        instruments are increasingly preferred over fines for systemic infrastructure</em>. Australia
+        sits at <span class="accent">6</span>, a middle ground between the high-enforcement US/UK
+        envelope and lower-intensity markets such as South Africa.
+      </p>
+      <p>
+        Compared with <strong>MENA</strong> and the single <strong>LATAM</strong> datapoint
+        (Peru), the patterns rhyme even where intensity differs. Technology triggers —
+        <em>API stability, batch-processing delay, data-sync error</em> — recur across mature and
+        emerging markets alike. The <strong>UAE</strong> sits at <span class="accent">7</span>,
+        <strong>South Africa</strong> and <strong>Peru</strong> at <span class="accent">5</span>.
+        That convergence on <em>what</em> regulators care about means a single resilience framework
+        can be tuned across MENA, LATAM and APAC; the calibration that needs to vary is severity, not
+        substance. Programmes that stand up one model and adapt enforcement intensity by jurisdiction
+        avoid duplicating policy work.
+      </p>
+      <p>
+        <strong>Strategic implication.</strong> Use this data to anticipate disruptions and to
+        monitor how different markets enforce against breaches. With the US and UK leading enforcement
+        intensity, regulated firms should expect heavier preparation costs there. Globally, however,
+        the pattern is consistent: enforcement clusters around <strong>fraud controls, cybersecurity,
+        and above all third-party oversight</strong>.
+      </p>
+    </div>
+
+    <div class="card insights" aria-label="Key insights">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Key Insights</h2>
+          <div class="card-sub">Top signals from the 2025–2026 dataset</div>
+        </div>
+        <div class="card-meta">SIGNAL DECK</div>
+      </div>
+      <ul>
+        <li>
+          <span class="num">01</span>
+          <span><b>USA leads on volume and monetary impact.</b> Five enforcement actions and
+            <span class="accent">$15.0M</span> in disclosed penalties — 47% of the global total —
+            driven by SEC ($10M, ICE) and CFPB ($5M, Cash App). Three federal regulators
+            (CFPB, OCC, SEC) are simultaneously active across distinct facets of the resilience
+            agenda.</span>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <span><b>UK posts the highest mean severity despite the fewest actions.</b> Three
+            interventions at an <span class="accent">8.33 average severity</span> —
+            Metro Bank's IT-governance fine, the Zilch enforceable undertaking, and the
+            CHAPS public censure — reflect the FCA and Bank of England's preference for
+            small-count, precedent-setting cases.</span>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <span><b>Third-party and vendor risk is the dominant trigger.</b> It recurs across
+            OCC (Blue Ridge, Lineage), HKMA (cloud resilience) and FCA (Metro Bank) actions —
+            a direct read-through to cloud-provider oversight and the most commercially
+            relevant signal across the resilience theme.</span>
+        </li>
+        <li>
+          <span class="num">04</span>
+          <span><b>Hong Kong is the most active single regulator.</b> The HKMA accounts for
+            four actions targeting digital wallets and SVF licensees (Alipay HK, WeChat Pay
+            HK, 33 Financial, Octopus Cards) — confirming the SVF/digital-wallet segment as
+            APAC's next supervisory frontier.</span>
+        </li>
+        <li>
+          <span class="num">05</span>
+          <span><b>Every technology trigger sits in the cloud value chain.</b> Vendor software
+            bugs, CSP outages, code-migration failures, intrusion-detection lag, hardware
+            failure, and middleware incompatibility are all <em>infrastructure-layer</em>
+            issues — the same surface where today's regulated platforms compete.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- RECENT ACTIONS TABLE -->
+  <section class="card recent" aria-label="Enforcement action register">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title">Enforcement Register · 2025 — 2026</h2>
+        <div class="card-sub">Pick a jurisdiction to view its enforcement actions · source: Vixio Master_Enforcement_Data</div>
+      </div>
+      <div class="card-meta">LIVE FEED</div>
+    </div>
+    <div id="enforce-country-selector" class="region-selector" role="tablist" aria-label="Jurisdiction filter"></div>
+    <div style="overflow-x:auto;">
+      <table id="register">
+        <thead>
+          <tr>
+            <th style="width: 110px;">Action ID</th>
+            <th style="width: 100px;">Date</th>
+            <th>Jurisdiction</th>
+            <th>Regulator</th>
+            <th>Entity</th>
+            <th>Resilience Issue</th>
+            <th style="text-align:right;">Penalty (USD)</th>
+            <th style="text-align:center; width: 90px;">Severity</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  </section>
+  <!-- ============ /TAB 1 ============ -->
+
+
+  <!-- ============ TAB 2 · PAYMENT ECOSYSTEM ============ -->
+  <section id="tab-ecosystem" class="tab-pane" role="tabpanel" hidden>
+
+    <!-- KPI STRIP -->
+    <section class="kpis" aria-label="Ecosystem headline metrics">
+      <div class="kpi">
+        <div class="k-label">Prominent Payment Schemes</div>
+        <div class="k-val" id="eco-kpi-schemes">80</div>
+        <div class="k-sub">Operating across 7 tracked jurisdictions</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">2024 Global Mobile-Money Volume</div>
+        <div class="k-val" id="eco-kpi-volume">108.7B</div>
+        <div class="k-sub">Transactions across 6 GSMA regions (source: GSMA)</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Digital-Rail Share of MM Volume</div>
+        <div class="k-val" id="eco-kpi-digital">77%</div>
+        <div class="k-sub">Pure-digital transactions vs. cash-in / cash-out</div>
+      </div>
+    </section>
+
+    <!-- MAIN GRID -->
+    <section class="grid-main">
+
+      <!-- PAYMENT SCHEMES MAP -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Prominent Payment Schemes · By Jurisdiction</h2>
+            <div class="card-sub">Regulated payment entities mapped to country · hover for detail · click to zoom in</div>
+          </div>
+          <div class="card-meta">22 SCHEMES</div>
+        </div>
+        <div id="scheme-map-wrap" style="position:relative; width:100%; height:480px; border-radius:10px;
+             background: radial-gradient(800px 400px at 50% 100%, rgba(55,184,203,0.20), transparent 70%),
+                         linear-gradient(180deg, var(--map-bg-top) 0%, var(--map-bg) 100%);
+             overflow:visible; border: 1px solid rgba(255,255,255,0.06);">
+          <svg id="scheme-map" role="img" aria-label="World map with payment schemes per jurisdiction" style="width:100%; height:100%; display:block; border-radius:10px; overflow:hidden;"></svg>
+          <button id="scheme-map-reset" class="map-reset-btn" aria-label="Reset map view">
+            <svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 12 L6 8 L10 4"/>
+            </svg>
+            Global View
+          </button>
+          <aside id="scheme-detail" class="country-detail" aria-live="polite"></aside>
+        </div>
+        <div class="legend-row" aria-label="Payment scheme legend" style="margin-top:10px;">
+          <div class="legend-item" style="gap: 10px;">
+            <span class="legend-swatch" style="background: #37B8CB; border: 1px solid rgba(55,184,203,0.35);"></span>
+            Tracked jurisdiction
+          </div>
+          <div class="legend-item"><span class="legend-swatch muted"></span>Out of Scope</div>
+        </div>
+      </div>
+
+      <!-- DIGITAL VS CASH CHART -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Digital vs Cash Usage · By GSMA Region</h2>
+            <div class="card-sub">Share of digital-rail transactions vs. cash-in/out · hover for absolute volumes</div>
+          </div>
+          <div class="card-meta">2024 · TRANSACTION VOLUME</div>
+        </div>
+        <div id="dc-chart-wrap" style="width:100%; height:420px; position:relative;">
+          <svg id="dc-chart" role="img" aria-label="Digital vs cash usage by GSMA region" style="width:100%; height:100%; display:block; overflow:visible;"></svg>
+        </div>
+        <div class="dc-legend" aria-label="Digital vs cash legend">
+          <span><span class="dc-legend-swatch digital"></span>Digital rails · P2P, merchant, bill-pay, bulk, airtime, international</span>
+          <span><span class="dc-legend-swatch cash"></span>Cash interface · cash-in &amp; cash-out</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ANALYSIS -->
+    <section class="analysis">
+      <div class="card analysis-text">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Analyst Commentary</h2>
+            <div class="card-sub">Vixio strategic intelligence · payment ecosystem &amp; digital adoption</div>
+          </div>
+          <div class="card-meta">Q2 2026 EDITION</div>
+        </div>
+        <p class="lead">
+          The regulatory landscape now sits on top of an increasingly digital payments stack.
+          <strong>Pix in Brazil</strong>, <strong>UPI in India</strong>, <strong>SEPA within
+          the EU</strong>, the global card networks, and a long tail of domestic real-time
+          schemes — each carries its own licensing, conduct, and resilience obligations. The
+          2024 data shows an <span class="accent">exponential rise in digital payment methods</span>
+          across the globe; UPI in India and Pix in Brazil are the clearest case studies of what
+          regulator-led rails do to a market.
+        </p>
+        <p>
+          Looked at as mobile money, <strong>India</strong> now hosts a dense set of wallets all
+          interoperating through UPI — <em>Unified Payments Interface</em>. UPI has grown
+          exponentially: <span class="accent">31.8% of the South Asian population</span>
+          transacts on UPI. Cash usage in consumer spending fell from <strong>80% in 2021 to
+          60% in 2024</strong>, with ATM withdrawals as the leading indicator. Any payments
+          programme entering India without a UPI strategy is unlikely to gain meaningful share —
+          and supervisory expectations are increasingly UPI-shaped, especially around outage
+          reporting and reconciliation.
+        </p>
+        <p>
+          In <strong>Brazil</strong>, Pix has become the dominant payment form: as of 2025,
+          <span class="accent">78.4% of Brazilians use Pix</span>, compared with
+          <strong>68% using cash</strong>. The Brazilian central bank has actively widened Pix's
+          scope since its 2020 launch, making it <em>one of the most widely adopted payment
+          mechanisms in the world</em>. As card rails are gradually de-prioritised, the
+          regulatory questions for institutions operating in Brazil shift accordingly — fraud
+          monitoring, dispute handling, and consumer-protection obligations are all being
+          re-shaped around Pix.
+        </p>
+        <p>
+          Across emerging markets, government-run digital rails increasingly displace the
+          <strong>card-only model</strong>. The strategic implication is two-fold: cross-border
+          reach improves, and so does the dependency on <span class="accent">UPI, Pix, and the
+          African RTP networks</span> — each with its own resilience and conduct expectations.
+          Firms that map their compliance programmes to these rails — rather than assuming
+          card-style oversight — position themselves to operate confidently in the
+          <strong>Global South</strong>, where digital payment schemes are doing the most to
+          formalise economic activity.
+        </p>
+        <p>
+          For B2B and enterprise platforms, the implication is the same: as small businesses
+          in emerging markets expect <em>real-time bank transfers</em> instead of corporate credit
+          lines, and as <span class="accent">biometric-authenticated one-click checkouts</span>
+          become the norm, the regulatory load that comes with each rail must travel with the
+          deployment. The Vixio Live Intelligence Console is built so this load is visible
+          before the deployment ships, not after the regulator notices.
+        </p>
+      </div>
+
+      <div class="card insights" aria-label="Ecosystem key insights">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Key Insights</h2>
+            <div class="card-sub">Top signals from the 2024 GSMA + Vixio entity dataset</div>
+          </div>
+          <div class="card-meta">SIGNAL DECK</div>
+        </div>
+        <ul>
+          <li>
+            <span class="num">01</span>
+            <span><b>UPI has become India's default payment rail.</b>
+              <span class="accent">31.8%</span> of the South Asian population now transacts on
+              UPI, while cash usage in consumer spending has fallen from
+              <strong>80% in 2021 to 60% in 2024</strong> — a payments programme entering India
+              without a UPI strategy is unlikely to gain meaningful share.</span>
+          </li>
+          <li>
+            <span class="num">02</span>
+            <span><b>Pix has overtaken cash in Brazil.</b>
+              <span class="accent">78.4%</span> of Brazilians use Pix versus
+              <strong>68% using cash</strong> (2025) — and because the central bank is actively
+              widening Pix's scope, supervisory expectations are re-shaping around Pix as card
+              rails are de-prioritised.</span>
+          </li>
+          <li>
+            <span class="num">03</span>
+            <span><b>Government-run digital rails are the Global-South growth frontier.</b>
+              Moving <em>away from a card-only model</em> toward UPI, Pix, and the broader
+              <strong>African RTP network</strong> unlocks cross-border reach and reduces
+              non-compliance exposure — but each rail carries its own resilience and conduct
+              obligations that must travel with the deployment.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PAYMENT SCHEMES REGISTER -->
+    <section class="card recent" aria-label="Payment schemes register">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Prominent Payment Schemes · Register</h2>
+          <div class="card-sub">Pick a region to view its domestic real-time payment schemes · source: Volt RTP World Map (Jan 2025)</div>
+        </div>
+        <div class="card-meta">RTP DECK</div>
+      </div>
+      <div id="scheme-region-selector" class="region-selector" role="tablist" aria-label="Region filter"></div>
+      <div style="overflow-x:auto;">
+        <table id="scheme-register">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th>Real-Time Payment Schemes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </section>
+  <!-- ============ /TAB 2 ============ -->
+
+</div>
+
+<!-- Tooltip (single, reused) -->
+<div class="tt" id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+/* =========================================================================
+   DATA · embedded from Global_Payments_Resilience_Master_2025_2026.xlsx
+   ========================================================================= */
+
+const ENFORCEMENT = [
+  {id:"ENF-2025-001", year:2025, date:"2025-01-16", country:"USA",          regulator:"CFPB",            entity:"Block, Inc. (Cash App)",        entityType:"P2P Payments",         issue:"Fraud Controls",         trigger:"Account Takeover",          penalty:5000000,  actionType:"Civil Penalty",            severity:10},
+  {id:"ENF-2025-002", year:2025, date:"2025-02-11", country:"USA",          regulator:"OCC",             entity:"Blue Ridge Bank",                entityType:"BaaS Bank",            issue:"Third-Party Risk",       trigger:"Vendor Software Bug",       penalty:0,        actionType:"Consent Order",            severity:8},
+  {id:"ENF-2025-003", year:2025, date:"2025-03-22", country:"Australia",    regulator:"ASIC",            entity:"ASX (CHESS)",                    entityType:"Clearing/Settlement",  issue:"System Availability",    trigger:"Code Migration Failure",    penalty:0,        actionType:"Regulatory Direction",     severity:8},
+  {id:"ENF-2025-004", year:2025, date:"2025-04-05", country:"UK",           regulator:"FCA",             entity:"Metro Bank",                     entityType:"Retail/Payments",      issue:"Operational Governance", trigger:"IT Governance Deficit",     penalty:12000000, actionType:"Fine",                     severity:10},
+  {id:"ENF-2025-005", year:2025, date:"2025-05-19", country:"UAE",          regulator:"CBUAE",           entity:"Pyramid Pay",                    entityType:"SVF Licensee",         issue:"Capital Adequacy",       trigger:"Under-capitalization",      penalty:120000,   actionType:"Administrative Fine",      severity:7},
+  {id:"ENF-2025-006", year:2025, date:"2025-06-12", country:"Hong Kong",    regulator:"HKMA",            entity:"33 Financial Services",          entityType:"Prepaid Issuer",       issue:"AML/CTF Systemic",       trigger:"Monitoring Logic Error",    penalty:141000,   actionType:"Pecuniary Penalty",        severity:7},
+  {id:"ENF-2025-007", year:2025, date:"2025-07-22", country:"Hong Kong",    regulator:"HKMA",            entity:"WeChat Pay HK",                  entityType:"Digital Wallet",       issue:"Transaction Monitoring", trigger:"Database Latency",          penalty:1120000,  actionType:"Public Reprimand",         severity:10},
+  {id:"ENF-2025-008", year:2025, date:"2025-08-14", country:"Peru",         regulator:"SBS",             entity:"Niubiz (VisaNet)",               entityType:"Merchant Aggregator",  issue:"Platform Stability",     trigger:"Interoperability Load",     penalty:45000,    actionType:"Sanction",                 severity:5},
+  {id:"ENF-2025-009", year:2025, date:"2025-09-02", country:"South Africa", regulator:"SARB (PA)",       entity:"Access Bank Ltd",                entityType:"Payment Clearing",     issue:"Processing Latency",     trigger:"Batch Processing Delay",    penalty:85000,    actionType:"Administrative Penalty",   severity:5},
+  {id:"ENF-2025-010", year:2025, date:"2025-10-11", country:"Australia",    regulator:"APRA",            entity:"Cuscal Limited",                 entityType:"Payment Infra",        issue:"Operational Risk",       trigger:"IT Audit Failure",          penalty:0,        actionType:"Capital Add-on",           severity:5},
+  {id:"ENF-2025-011", year:2025, date:"2025-11-20", country:"UK",           regulator:"Bank of England", entity:"CHAPS Systemic Hub",             entityType:"FMI (Infrastructure)", issue:"Settlement Continuity",  trigger:"Hardware Failure",          penalty:0,        actionType:"Public Censure",           severity:5},
+  {id:"ENF-2025-012", year:2025, date:"2025-12-05", country:"USA",          regulator:"SEC",             entity:"Intercontinental Exchange",      entityType:"Market Operator",      issue:"Cyber Disclosure",       trigger:"Intrusion Detection Lag",   penalty:10000000, actionType:"Civil Penalty",            severity:10},
+  {id:"ENF-2025-013", year:2025, date:"2025-12-18", country:"UAE",          regulator:"FSRA (ADGM)",     entity:"CryptoGate Payments",            entityType:"PSP",                  issue:"Governance",             trigger:"Lack of BCP",               penalty:500000,   actionType:"License Suspension",       severity:7},
+  {id:"ENF-2025-014", year:2025, date:"2025-01-08", country:"Hong Kong",    regulator:"HKMA",            entity:"Alipay HK",                      entityType:"Digital Wallet",       issue:"Cloud Resilience",       trigger:"CSP Outage",                penalty:250000,   actionType:"Supervisory Letter",       severity:7},
+  {id:"ENF-2025-015", year:2025, date:"2025-02-24", country:"South Africa", regulator:"SARB (PA)",       entity:"Direct Axis",                    entityType:"Consumer Finance",     issue:"Data Integrity",         trigger:"Data Sync Error",           penalty:60000,    actionType:"Penalty",                  severity:5},
+  {id:"ENF-2025-016", year:2026, date:"2026-01-12", country:"UK",           regulator:"FCA",             entity:"Zilch Technology",               entityType:"BNPL/Payments",        issue:"Consumer Protection",    trigger:"Credit Decisioning Bug",    penalty:1800000,  actionType:"Enforceable Undertaking",  severity:10},
+  {id:"ENF-2025-017", year:2026, date:"2026-01-29", country:"USA",          regulator:"CFPB",            entity:"Synapse Financial (Trustee)",    entityType:"Fintech Middleware",   issue:"Liquidation/Resilience", trigger:"Middleware Incompatibility", penalty:0,       actionType:"Order to Liquidate",       severity:5},
+  {id:"ENF-2025-018", year:2026, date:"2026-02-14", country:"Peru",         regulator:"SBS",             entity:"Izipay Aggregator",              entityType:"Merchant Acquirer",    issue:"API Stability",          trigger:"API Rate Limiting",         penalty:35000,    actionType:"Technical Mandate",        severity:5},
+  {id:"ENF-2025-019", year:2026, date:"2026-02-28", country:"Australia",    regulator:"RBA",             entity:"Westpac (PayGate)",              entityType:"Payment Gateway",      issue:"Legacy Tech Risk",       trigger:"Core Banking Hub",          penalty:0,        actionType:"Court Order",              severity:5},
+  {id:"ENF-2025-020", year:2026, date:"2026-03-15", country:"UAE",          regulator:"CBUAE",           entity:"NeoPay Solutions",               entityType:"Digital Bank",         issue:"Systemic Outage",        trigger:"Server Overload",           penalty:210000,   actionType:"Fine",                     severity:7},
+  {id:"ENF-2025-021", year:2026, date:"2026-03-29", country:"Hong Kong",    regulator:"HKMA",            entity:"Octopus Cards Ltd",              entityType:"SVF/Smart Card",       issue:"System Scalability",     trigger:"Concurrent User Peak",      penalty:400000,   actionType:"Remedial Order",           severity:7},
+  {id:"ENF-2025-022", year:2026, date:"2026-04-10", country:"USA",          regulator:"OCC",             entity:"Lineage Bank",                   entityType:"BaaS / Fintech",       issue:"Third-Party Risk",       trigger:"Vendor Oversight",          penalty:0,        actionType:"Cease & Desist",           severity:8}
+];
+
+/* Pre-aggregated by-country (matches Dashboard_By_Country sheet) */
+const COUNTRY_AGG = [
+  { country: "USA",          penaltyUSD: 15000000, totalActions: 5, avgSeverity: 8.20 },
+  { country: "UK",           penaltyUSD: 13800000, totalActions: 3, avgSeverity: 8.33 },
+  { country: "Hong Kong",    penaltyUSD: 1911000,  totalActions: 4, avgSeverity: 7.75 },
+  { country: "UAE",          penaltyUSD: 830000,   totalActions: 3, avgSeverity: 7.00 },
+  { country: "South Africa", penaltyUSD: 145000,   totalActions: 2, avgSeverity: 5.00 },
+  { country: "Peru",         penaltyUSD: 80000,    totalActions: 2, avgSeverity: 5.00 },
+  { country: "Australia",    penaltyUSD: 0,        totalActions: 3, avgSeverity: 6.00 }
+];
+
+/* ISO numeric → display name (world-atlas v2 uses these IDs) */
+const COUNTRY_BY_ISO = {
+  "840": "USA",
+  "826": "UK",
+  "344": "Hong Kong",
+  "784": "UAE",
+  "710": "South Africa",
+  "604": "Peru",
+   "36": "Australia"
+};
+
+/* =========================================================================
+   HELPERS
+   ========================================================================= */
+const fmtUSD = n => {
+  if (n === 0) return "$0";
+  if (n >= 1e9) return "$" + (n/1e9).toFixed(2) + "B";
+  if (n >= 1e6) return "$" + (n/1e6).toFixed(2) + "M";
+  if (n >= 1e3) return "$" + (n/1e3).toFixed(0) + "K";
+  return "$" + n.toLocaleString();
+};
+const severityBucket = s => s >= 8 ? "high" : (s >= 4 ? "med" : "low");
+const severityLabel  = s => s >= 8 ? "High (8–10)" : (s >= 4 ? "Medium (4–7)" : "Low (1–3)");
+
+const COUNTRY_LOOKUP = Object.fromEntries(COUNTRY_AGG.map(c => [c.country, c]));
+
+/* Flag emoji lookup for every jurisdiction referenced by the two registers.
+   Used to prefix country names in the Enforcement Register (Tab 1) and the
+   Payment Schemes Register (Tab 2). */
+const COUNTRY_FLAG = {
+  "USA":"🇺🇸", "UK":"🇬🇧", "Hong Kong":"🇭🇰", "UAE":"🇦🇪", "South Africa":"🇿🇦",
+  "Peru":"🇵🇪", "Australia":"🇦🇺", "Canada":"🇨🇦", "Argentina":"🇦🇷", "Brazil":"🇧🇷",
+  "Bolivia":"🇧🇴", "El Salvador":"🇸🇻", "Honduras":"🇭🇳", "Mexico":"🇲🇽",
+  "Cambodia":"🇰🇭", "Brunei":"🇧🇳", "China":"🇨🇳", "Indonesia":"🇮🇩", "Japan":"🇯🇵",
+  "Kazakhstan":"🇰🇿", "Malaysia":"🇲🇾", "Philippines":"🇵🇭", "Singapore":"🇸🇬",
+  "South Korea":"🇰🇷", "Taiwan":"🇹🇼", "Thailand":"🇹🇭", "Vietnam":"🇻🇳",
+  "Austria":"🇦🇹", "Azerbaijan":"🇦🇿", "Belgium":"🇧🇪", "Bulgaria":"🇧🇬",
+  "Croatia":"🇭🇷", "Cyprus":"🇨🇾", "Czech Republic":"🇨🇿", "Denmark":"🇩🇰",
+  "Estonia":"🇪🇪", "Finland":"🇫🇮", "France":"🇫🇷", "Germany":"🇩🇪", "Greece":"🇬🇷",
+  "Hungary":"🇭🇺", "Iceland":"🇮🇸", "Ireland":"🇮🇪", "Italy":"🇮🇹", "Latvia":"🇱🇻",
+  "Lithuania":"🇱🇹", "Luxembourg":"🇱🇺", "Netherlands":"🇳🇱", "Malta":"🇲🇹",
+  "Norway":"🇳🇴", "Poland":"🇵🇱", "Portugal":"🇵🇹", "Romania":"🇷🇴", "Russia":"🇷🇺",
+  "Serbia":"🇷🇸", "Slovakia":"🇸🇰", "Slovenia":"🇸🇮", "Spain":"🇪🇸", "Sweden":"🇸🇪",
+  "Switzerland":"🇨🇭", "Turkey":"🇹🇷", "Ukraine":"🇺🇦", "Bahrain":"🇧🇭", "Egypt":"🇪🇬",
+  "Ethiopia":"🇪🇹", "Ghana":"🇬🇭", "India":"🇮🇳", "Jordan":"🇯🇴", "Kenya":"🇰🇪",
+  "Kuwait":"🇰🇼", "Lebanon":"🇱🇧", "Mongolia":"🇲🇳", "Nepal":"🇳🇵", "Nigeria":"🇳🇬",
+  "Oman":"🇴🇲", "Pakistan":"🇵🇰", "Qatar":"🇶🇦", "Saudi Arabia":"🇸🇦",
+  "Sri Lanka":"🇱🇰", "Tanzania":"🇹🇿"
+};
+const flagFor = c => COUNTRY_FLAG[c] || "";
+
+/* Per-country analyst summaries (distilled from the full commentary below the map).
+   Shown inside the click-to-zoom detail panel so each country carries its own brief. */
+const COUNTRY_ANALYSIS = {
+  "USA":
+    "<strong>Severity 8.2 — high-enforcement market.</strong> Cumulative fines of <strong>$15M USD</strong> " +
+    "driven by high-activity enforcement against fraud protection and third-party oversight. Compliance " +
+    "teams should treat internal controls and supply-chain mapping as a continuous discipline, particularly " +
+    "where client-facing software is in the critical path.",
+  "UK":
+    "<strong>Severity 8.3 — highest mean severity globally</strong> across only three actions. Reflects the " +
+    "FCA and Bank of England's preference for a small number of high-impact, precedent-setting interventions. " +
+    "Focus is shifting toward third-party oversight failures and IT governance — programmes should expect " +
+    "fewer but heavier interventions and prepare governance evidence accordingly.",
+  "Hong Kong":
+    "<strong>Severity 7.75 — robust APAC framework</strong> with active regulator communication. Triggers " +
+    "cluster around <em>cloud resilience, monitoring logic, database latency and concurrent-load failures</em> — " +
+    "all infrastructure-level risks that translate directly into platform and vendor obligations.",
+  "Australia":
+    "<strong>Severity 6 — middle-ground market.</strong> ASIC, APRA and the RBA issue non-monetary but " +
+    "structurally significant interventions — capital add-ons, regulatory directions, court orders — signalling " +
+    "that <em>capital and licence instruments are increasingly preferred over fines</em> for systemic infrastructure.",
+  "UAE":
+    "<strong>Severity 7 — operationalising SVF and digital-bank regimes.</strong> Technology triggers — " +
+    "<em>API stability, batch-processing delay, data-sync error</em> — mirror those seen in mature markets, " +
+    "indicating supervisory convergence despite a lower overall enforcement intensity.",
+  "Peru":
+    "<strong>Severity 5 — lower enforcement, converging triggers.</strong> Technology triggers (API stability, " +
+    "batch-processing, data-sync) mirror mature markets even though penalty quanta are smaller — a candidate " +
+    "for a <em>unified MENA / LATAM / APAC framework</em> tuned for severity rather than substance.",
+  "South Africa":
+    "<strong>Severity 5 — proportionate emerging-market posture.</strong> SARB-PA calibrates smaller penalties " +
+    "against clearing participants and consumer finance, but triggers (<em>data integrity, processing latency</em>) " +
+    "mirror mature markets — suitable for the same convergent framework as Peru and the UAE."
+};
+
+/* Continuous severity gradient — light blue (lowest) → dark red (highest),
+   domain set to the actual min/max country average severity so the full
+   colour range is used. HCL interpolation gives a smooth perceptual ramp. */
+const SEVERITY_VALUES = COUNTRY_AGG.map(c => c.avgSeverity);
+const SEV_MIN = d3.min(SEVERITY_VALUES);
+const SEV_MAX = d3.max(SEVERITY_VALUES);
+const severityColor = d3.scaleLinear()
+  .domain([SEV_MIN, SEV_MAX])
+  .range(['#93c5fd', '#7f1d1d'])
+  .interpolate(d3.interpolateHcl)
+  .clamp(true);
+
+// Lighter version for use on the dark tooltip (readable on navy)
+function tooltipSeverityColor(sev) {
+  const hcl = d3.hcl(severityColor(sev));
+  const l = Math.min(88, Math.max(65, hcl.l + 22));
+  return d3.hcl(hcl.h, hcl.c, l).toString();
+}
+
+// Brighter version for use on the dark detail panel (readable against navy)
+function panelSeverityColor(sev) {
+  const hcl = d3.hcl(severityColor(sev));
+  const l = Math.min(88, Math.max(66, hcl.l + 22));
+  return d3.hcl(hcl.h, hcl.c, l).toString();
+}
+
+// Safe slug for DOM/SVG IDs
+const slug = s => s.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
+
+// Populate the severity legend (gradient bar + min/max labels)
+function renderLegend() {
+  document.getElementById('legend-min').textContent = SEV_MIN.toFixed(2);
+  document.getElementById('legend-max').textContent = SEV_MAX.toFixed(2);
+  // Sample 11 stops from the HCL scale so the CSS gradient matches D3 exactly
+  const stops = d3.range(0, 1.0001, 0.1).map(t => {
+    const v = SEV_MIN + t * (SEV_MAX - SEV_MIN);
+    return `${severityColor(v)} ${(t * 100).toFixed(0)}%`;
+  }).join(', ');
+  document.getElementById('legend-gradient-bar').style.background =
+    `linear-gradient(90deg, ${stops})`;
+}
+
+/* =========================================================================
+   TOOLTIP
+   ========================================================================= */
+const tt = document.getElementById('tooltip');
+function showTooltip(html, evt) {
+  tt.innerHTML = html;
+  tt.classList.add('show');
+  tt.setAttribute('aria-hidden', 'false');
+  positionTooltip(evt);
+}
+function moveTooltip(evt) { positionTooltip(evt); }
+function hideTooltip() {
+  tt.classList.remove('show');
+  tt.setAttribute('aria-hidden', 'true');
+}
+function positionTooltip(evt) {
+  const pad = 14;
+  const w = tt.offsetWidth || 240;
+  const h = tt.offsetHeight || 120;
+  let x = evt.clientX + pad;
+  let y = evt.clientY + pad;
+  if (x + w + 8 > window.innerWidth)  x = evt.clientX - w - pad;
+  if (y + h + 8 > window.innerHeight) y = evt.clientY - h - pad;
+  tt.style.left = x + 'px';
+  tt.style.top  = y + 'px';
+}
+
+function countryTooltipHTML(name, agg, mode /* 'severity' | 'volume' */) {
+  if (!agg) {
+    return `
+      <div class="tt-title">${name}</div>
+      <div class="tt-row"><span class="l">Status</span><span class="v" style="color:var(--text-3);">Out of dataset scope</span></div>
+    `;
+  }
+  const dotColor = severityColor(agg.avgSeverity);
+  const sevTextColor = tooltipSeverityColor(agg.avgSeverity);
+  const sevHTML = `<span class="v" style="color:${sevTextColor};">${agg.avgSeverity.toFixed(2)} / 10</span>`;
+  const headlineRow = mode === 'volume'
+    ? `<div class="tt-row"><span class="l">Enforcement actions</span><span class="v">${agg.totalActions}</span></div>`
+    : `<div class="tt-row"><span class="l">Avg severity score</span>${sevHTML}</div>`;
+  const secondaryRow = mode === 'volume'
+    ? `<div class="tt-row"><span class="l">Avg severity score</span>${sevHTML}</div>`
+    : `<div class="tt-row"><span class="l">Enforcement actions</span><span class="v">${agg.totalActions}</span></div>`;
+  return `
+    <div class="tt-title">
+      <span class="tt-dot" style="background:${dotColor}; color:${dotColor};"></span>
+      ${name}
+    </div>
+    ${headlineRow}
+    ${secondaryRow}
+    <div class="tt-row"><span class="l">Aggregate penalty</span><span class="v">${fmtUSD(agg.penaltyUSD)}</span></div>
+  `;
+}
+
+/* =========================================================================
+   MAP (D3 + topojson world-atlas)
+   ========================================================================= */
+async function renderMap() {
+  const svgEl = document.getElementById('map');
+  const wrap  = document.getElementById('map-wrap');
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+
+  const svg = d3.select(svgEl).attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+
+  // Clean up any previous zoom state (e.g. after a window resize)
+  const _resetBtnEl = document.getElementById('map-reset');
+  const _detailEl   = document.getElementById('country-detail');
+  if (_resetBtnEl) _resetBtnEl.classList.remove('show');
+  if (_detailEl)   { _detailEl.classList.remove('show'); _detailEl.innerHTML = ''; }
+
+  const defs = svg.append('defs');
+  // Subtle radial vignette (very soft on the light surface)
+  const grad = defs.append('radialGradient').attr('id', 'mapGlow').attr('cx', '50%').attr('cy', '60%').attr('r', '70%');
+  grad.append('stop').attr('offset', '0%').attr('stop-color', '#ffffff').attr('stop-opacity', 0.0);
+  grad.append('stop').attr('offset', '100%').attr('stop-color', '#87aac6').attr('stop-opacity', 0.32);
+
+  let topo;
+  try {
+    topo = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+  } catch (err) {
+    topo = await d3.json('https://unpkg.com/world-atlas@2/countries-110m.json');
+  }
+  const countries = topojson.feature(topo, topo.objects.countries).features;
+
+  const projection = d3.geoEqualEarth().fitSize([W, H * 0.95], { type: 'Sphere' });
+  const path = d3.geoPath(projection);
+
+  // Wrap all zoomable geometry in a single transform group
+  const mapRoot = svg.append('g').attr('class', 'map-root');
+
+  // Sphere & graticule
+  mapRoot.append('path').attr('d', path({ type: 'Sphere' })).attr('class', 'sphere');
+  mapRoot.append('path').attr('d', path(d3.geoGraticule10())).attr('class', 'graticule');
+
+  // Countries
+  const countryPaths = mapRoot.append('g')
+    .selectAll('path')
+    .data(countries)
+    .join('path')
+    .attr('d', path)
+    .attr('class', d => {
+      const tracked = COUNTRY_BY_ISO[String(+d.id)];
+      return tracked ? 'country tracked' : 'country dim bordered';
+    })
+    .attr('fill', d => {
+      const tracked = COUNTRY_BY_ISO[String(+d.id)];
+      if (!tracked) return null; // falls back to CSS (--muted-country)
+      return severityColor(COUNTRY_LOOKUP[tracked].avgSeverity);
+    })
+    .attr('data-country', d => COUNTRY_BY_ISO[String(+d.id)] || '')
+    .on('mouseenter', function (evt, d) {
+      const id = String(+d.id);
+      const tracked = COUNTRY_BY_ISO[id];
+      if (!tracked) return;
+      const agg = COUNTRY_LOOKUP[tracked];
+      showTooltip(countryTooltipHTML(tracked, agg, 'severity'), evt);
+    })
+    .on('mousemove', function (evt) { moveTooltip(evt); })
+    .on('mouseleave', hideTooltip)
+    .on('click', function (evt, d) {
+      const id = String(+d.id);
+      const tracked = COUNTRY_BY_ISO[id];
+      if (!tracked) return;
+      const agg = COUNTRY_LOOKUP[tracked];
+      hideTooltip();
+      if (zoomedFeature === d) { resetZoom(); return; }
+      zoomToCountry(d, tracked, agg);
+    });
+
+  // Country labels (inside mapRoot so they track with the zoom, but fade out while zoomed)
+  const labelOffsets = {
+    "USA":          { dx: 0,   dy: 0  },
+    "UK":           { dx: 0,   dy: -6 },
+    "Hong Kong":    { dx: 8,   dy: 6  },
+    "UAE":          { dx: 22,  dy: 2  },
+    "South Africa": { dx: 4,   dy: 10 },
+    "Peru":         { dx: -4,  dy: 4  },
+    "Australia":    { dx: 0,   dy: 0  }
+  };
+  const trackedCentroids = countries
+    .filter(d => COUNTRY_BY_ISO[String(+d.id)])
+    .map(d => {
+      const name = COUNTRY_BY_ISO[String(+d.id)];
+      const c = path.centroid(d);
+      const off = labelOffsets[name] || { dx: 0, dy: 0 };
+      return { name, x: c[0] + off.dx, y: c[1] + off.dy };
+    });
+
+  const labelG = mapRoot.append('g').attr('class', 'map-labels').style('pointer-events', 'none');
+  labelG.selectAll('text')
+    .data(trackedCentroids)
+    .join('text')
+    .attr('x', d => d.x)
+    .attr('y', d => d.y)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#0b1220')
+    .attr('stroke', 'rgba(255,255,255,0.96)')
+    .attr('stroke-width', 4)
+    .attr('stroke-linejoin', 'round')
+    .attr('paint-order', 'stroke')
+    .style('font-family', "'Fira Sans', system-ui, sans-serif")
+    .style('font-size', '12px')
+    .style('font-weight', 700)
+    .style('letter-spacing', '1.1px')
+    .text(d => d.name.toUpperCase());
+
+  /* Hong Kong is too small to render as a polygon at world-atlas 110m
+     resolution (it's merged into China), so draw a dedicated point marker
+     at its real coordinates with the same severity colour and interactions. */
+  const HK_COORDS      = [114.17, 22.32]; // [lon, lat]
+  const HK_BASE_R      = 5.5;
+  const HK_BASE_R_GLOW = 11;
+  const [hkX, hkY] = projection(HK_COORDS);
+  const hkAgg   = COUNTRY_LOOKUP['Hong Kong'];
+  const hkColor = severityColor(hkAgg.avgSeverity);
+
+  const hkMarker = mapRoot.append('g').attr('class', 'hk-marker');
+
+  const hkGlow = hkMarker.append('circle')
+    .attr('class', 'hk-glow')
+    .attr('cx', hkX).attr('cy', hkY).attr('r', HK_BASE_R_GLOW)
+    .attr('fill', hkColor).attr('opacity', 0.30)
+    .style('pointer-events', 'none');
+
+  const hkDot = hkMarker.append('circle')
+    .attr('class', 'hk-dot')
+    .attr('cx', hkX).attr('cy', hkY).attr('r', HK_BASE_R)
+    .attr('fill', hkColor)
+    .attr('stroke', 'rgba(255,255,255,0.95)')
+    .attr('stroke-width', 1.2)
+    .attr('vector-effect', 'non-scaling-stroke')
+    .style('cursor', 'pointer')
+    .style('filter', 'drop-shadow(0 2px 5px rgba(15,23,42,0.35))')
+    .on('mouseenter', function (evt) {
+      showTooltip(countryTooltipHTML('Hong Kong', hkAgg, 'severity'), evt);
+    })
+    .on('mousemove', function (evt) { moveTooltip(evt); })
+    .on('mouseleave', hideTooltip)
+    .on('click', function () {
+      hideTooltip();
+      if (zoomedFeature === 'HK_POINT') { resetZoom(); return; }
+      zoomToHongKong();
+    });
+
+  // Hong Kong label — appended to the same labelG so it fades with the others
+  labelG.append('text')
+    .attr('class', 'hk-label')
+    .attr('x', hkX + 11).attr('y', hkY + 11)
+    .attr('text-anchor', 'start')
+    .attr('fill', '#0b1220')
+    .attr('stroke', 'rgba(255,255,255,0.96)')
+    .attr('stroke-width', 4)
+    .attr('stroke-linejoin', 'round')
+    .attr('paint-order', 'stroke')
+    .style('font-family', "'Fira Sans', system-ui, sans-serif")
+    .style('font-size', '12px')
+    .style('font-weight', 700)
+    .style('letter-spacing', '1.1px')
+    .text('HONG KONG');
+
+  /* UAE point marker — the UAE polygon renders on the world-atlas data, but it's
+     small enough to be easy to miss, so we add a matching marker dot like HK. */
+  const UAE_COORDS      = [54.4, 24.0]; // ~Abu Dhabi lon/lat
+  const UAE_BASE_R      = 5.5;
+  const UAE_BASE_R_GLOW = 11;
+  const [uaeX, uaeY] = projection(UAE_COORDS);
+  const uaeAgg   = COUNTRY_LOOKUP['UAE'];
+  const uaeColor = severityColor(uaeAgg.avgSeverity);
+
+  const uaeMarker = mapRoot.append('g').attr('class', 'uae-marker');
+
+  const uaeGlow = uaeMarker.append('circle')
+    .attr('class', 'uae-glow')
+    .attr('cx', uaeX).attr('cy', uaeY).attr('r', UAE_BASE_R_GLOW)
+    .attr('fill', uaeColor).attr('opacity', 0.30)
+    .style('pointer-events', 'none');
+
+  const uaeDot = uaeMarker.append('circle')
+    .attr('class', 'uae-dot')
+    .attr('cx', uaeX).attr('cy', uaeY).attr('r', UAE_BASE_R)
+    .attr('fill', uaeColor)
+    .attr('stroke', 'rgba(255,255,255,0.95)')
+    .attr('stroke-width', 1.2)
+    .attr('vector-effect', 'non-scaling-stroke')
+    .style('cursor', 'pointer')
+    .style('filter', 'drop-shadow(0 2px 5px rgba(15,23,42,0.35))')
+    .on('mouseenter', function (evt) {
+      showTooltip(countryTooltipHTML('UAE', uaeAgg, 'severity'), evt);
+    })
+    .on('mousemove', function (evt) { moveTooltip(evt); })
+    .on('mouseleave', hideTooltip)
+    .on('click', function () {
+      hideTooltip();
+      if (zoomedFeature === 'UAE_POINT') { resetZoom(); return; }
+      zoomToUAE();
+    });
+
+  // UAE label is already rendered from the polygon centroid above; no separate
+  // marker-label needed (unlike HK, whose polygon is absent at 110m).
+
+  // Static vignette overlay (outside mapRoot so it doesn't zoom)
+  svg.append('rect')
+    .attr('width', W).attr('height', H)
+    .attr('fill', 'url(#mapGlow)')
+    .style('pointer-events', 'none');
+
+  /* --- Click-to-zoom interaction --- */
+  let zoomedFeature = null;
+  const resetBtn    = document.getElementById('map-reset');
+  const detailPanel = document.getElementById('country-detail');
+
+  function zoomToCountry(feature, countryName, agg) {
+    const [[x0, y0], [x1, y1]] = path.bounds(feature);
+    const dx = Math.max(1, x1 - x0);
+    const dy = Math.max(1, y1 - y0);
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
+
+    // Reserve the right strip for the detail panel so the country
+    // frames inside the VISIBLE area, not behind the panel.
+    const PANEL_RESERVED = 340;
+    const effectiveW = Math.max(140, W - PANEL_RESERVED);
+    const padRatio   = 0.82;
+
+    const kFit = Math.min(padRatio * effectiveW / dx, padRatio * H / dy);
+    const k    = Math.max(1.8, Math.min(10, kFit));
+
+    const targetCX = effectiveW / 2;   // center within the visible (left) area
+    const targetCY = H / 2;
+    const tx = targetCX - cx * k;
+    const ty = targetCY - cy * k;
+
+    mapRoot.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('transform', `translate(${tx}, ${ty}) scale(${k})`);
+
+    countryPaths.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('opacity', d => d === feature ? 1 : 0.22);
+
+    // Dim the Hong Kong and UAE markers and counter-scale so visual size stays constant
+    hkMarker.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 0.22);
+    hkDot.transition().duration(950).ease(d3.easeCubicInOut).attr('r', HK_BASE_R / k);
+    hkGlow.transition().duration(950).ease(d3.easeCubicInOut).attr('r', HK_BASE_R_GLOW / k);
+    uaeMarker.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 0.22);
+    uaeDot.transition().duration(950).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R / k);
+    uaeGlow.transition().duration(950).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R_GLOW / k);
+
+    labelG.transition().duration(450).attr('opacity', 0);
+
+    resetBtn.classList.add('show');
+    renderDetailPanel(countryName, agg);
+    zoomedFeature = feature;
+  }
+
+  function zoomToHongKong() {
+    const PANEL_RESERVED = 340;
+    const effectiveW = Math.max(140, W - PANEL_RESERVED);
+    const k = 6; // HK is a point — pick a fixed, expressive zoom
+
+    const targetCX = effectiveW / 2;
+    const targetCY = H / 2;
+    const tx = targetCX - hkX * k;
+    const ty = targetCY - hkY * k;
+
+    mapRoot.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('transform', `translate(${tx}, ${ty}) scale(${k})`);
+
+    countryPaths.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('opacity', 0.22);
+
+    // Keep the HK marker visible at its original on-screen size by counter-scaling
+    hkMarker.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 1);
+    hkDot.transition().duration(950).ease(d3.easeCubicInOut).attr('r', HK_BASE_R / k);
+    hkGlow.transition().duration(950).ease(d3.easeCubicInOut).attr('r', HK_BASE_R_GLOW / k);
+    uaeMarker.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 0.22);
+    uaeDot.transition().duration(950).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R / k);
+    uaeGlow.transition().duration(950).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R_GLOW / k);
+
+    labelG.transition().duration(450).attr('opacity', 0);
+
+    resetBtn.classList.add('show');
+    renderDetailPanel('Hong Kong', hkAgg);
+    zoomedFeature = 'HK_POINT';
+  }
+
+  function zoomToUAE() {
+    const PANEL_RESERVED = 340;
+    const effectiveW = Math.max(140, W - PANEL_RESERVED);
+    const k = 6;
+    const tx = effectiveW / 2 - uaeX * k;
+    const ty = H / 2 - uaeY * k;
+
+    mapRoot.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('transform', `translate(${tx}, ${ty}) scale(${k})`);
+    countryPaths.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 0.22);
+
+    // Dim the HK marker, emphasise UAE, counter-scale both
+    hkMarker.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 0.22);
+    hkDot.transition().duration(950).ease(d3.easeCubicInOut).attr('r', HK_BASE_R / k);
+    hkGlow.transition().duration(950).ease(d3.easeCubicInOut).attr('r', HK_BASE_R_GLOW / k);
+    uaeMarker.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 1);
+    uaeDot.transition().duration(950).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R / k);
+    uaeGlow.transition().duration(950).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R_GLOW / k);
+
+    labelG.transition().duration(450).attr('opacity', 0);
+
+    resetBtn.classList.add('show');
+    renderDetailPanel('UAE', uaeAgg);
+    zoomedFeature = 'UAE_POINT';
+  }
+
+  function resetZoom() {
+    mapRoot.transition().duration(900).ease(d3.easeCubicInOut)
+      .attr('transform', 'translate(0,0) scale(1)');
+    countryPaths.transition().duration(900).ease(d3.easeCubicInOut)
+      .attr('opacity', 1);
+
+    // Restore Hong Kong & UAE markers to their natural size and visibility
+    hkMarker.transition().duration(900).ease(d3.easeCubicInOut).attr('opacity', 1);
+    hkDot.transition().duration(900).ease(d3.easeCubicInOut).attr('r', HK_BASE_R);
+    hkGlow.transition().duration(900).ease(d3.easeCubicInOut).attr('r', HK_BASE_R_GLOW);
+    uaeMarker.transition().duration(900).ease(d3.easeCubicInOut).attr('opacity', 1);
+    uaeDot.transition().duration(900).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R);
+    uaeGlow.transition().duration(900).ease(d3.easeCubicInOut).attr('r', UAE_BASE_R_GLOW);
+
+    labelG.transition().delay(300).duration(500).attr('opacity', 1);
+
+    resetBtn.classList.remove('show');
+    detailPanel.classList.remove('show');
+    // Restore the map card to its natural height (shrinks the page back to normal)
+    const _mapCard = document.getElementById('map-wrap').closest('.card');
+    if (_mapCard) _mapCard.style.paddingBottom = '';
+    // Clear contents after the fade-out transition completes
+    setTimeout(() => { if (!detailPanel.classList.contains('show')) detailPanel.innerHTML = ''; }, 360);
+    zoomedFeature = null;
+  }
+
+  function renderDetailPanel(countryName, agg) {
+    const rows = ENFORCEMENT
+      .filter(e => e.country === countryName)
+      .sort((a, b) => (b.severity - a.severity) || (new Date(b.date) - new Date(a.date)));
+
+    const aggSevColor = panelSeverityColor(agg.avgSeverity);
+
+    const actionItems = rows.map(r => {
+      const b = severityBucket(r.severity);
+      const penaltyCell = r.penalty > 0
+        ? `<span class="a-penalty">${fmtUSD(r.penalty)}</span>`
+        : `<span class="a-penalty zero">No monetary penalty</span>`;
+      return `
+        <li>
+          <div class="a-row1">
+            <span class="a-date">${r.date}</span>
+            <span class="a-regulator">${r.regulator}</span>
+            <span class="a-sev ${b}">${r.severity}/10</span>
+          </div>
+          <div class="a-entity">${r.entity}</div>
+          <div class="a-row3">
+            <span class="a-issue">${r.issue} · ${r.actionType}</span>
+            ${penaltyCell}
+          </div>
+        </li>
+      `;
+    }).join('');
+
+    const summary = COUNTRY_ANALYSIS[countryName];
+    const summaryBlock = summary ? `
+      <div class="cd-summary">
+        <div class="cd-summary-header">Analyst Summary</div>
+        <p>${summary}</p>
+      </div>
+    ` : '';
+
+    detailPanel.innerHTML = `
+      <div class="cd-header">
+        <div>
+          <div class="cd-title"><span class="flag" aria-hidden="true">${flagFor(countryName)}</span>${countryName}</div>
+          <div class="cd-sub">${agg.totalActions} enforcement actions · ${fmtUSD(agg.penaltyUSD)}</div>
+        </div>
+        <button class="cd-close" id="cd-close" aria-label="Close detail panel">×</button>
+      </div>
+      <div class="cd-metrics">
+        <div class="cd-metric"><div class="m-l">Avg Severity</div><div class="m-v" style="color:${aggSevColor};">${agg.avgSeverity.toFixed(2)}</div></div>
+        <div class="cd-metric"><div class="m-l">Actions</div><div class="m-v">${agg.totalActions}</div></div>
+        <div class="cd-metric"><div class="m-l">Penalties</div><div class="m-v">${fmtUSD(agg.penaltyUSD)}</div></div>
+      </div>
+      ${summaryBlock}
+      <div class="cd-list-header">Enforcement Register · ${countryName}</div>
+      <ul class="cd-actions">${actionItems}</ul>
+    `;
+    detailPanel.classList.add('show');
+    document.getElementById('cd-close').onclick = resetZoom;
+    // Grow the map card to fit the panel so it doesn't visually cover content below
+    requestAnimationFrame(sizeCardToPanel);
+  }
+
+  function sizeCardToPanel() {
+    const card = document.getElementById('map-wrap').closest('.card');
+    if (!card) return;
+    // Clear any previous adjustment so we measure the natural card bottom
+    card.style.paddingBottom = '';
+    const panelRect = detailPanel.getBoundingClientRect();
+    const cardRect  = card.getBoundingClientRect();
+    const overflow  = panelRect.bottom - cardRect.bottom;
+    if (overflow > 0) {
+      // 14px was the original padding-bottom; add the overflow + a small buffer
+      card.style.paddingBottom = (14 + overflow + 14) + 'px';
+    }
+  }
+
+  resetBtn.onclick = resetZoom;
+}
+
+/* =========================================================================
+   BAR CHART (custom SVG, sorted by total actions desc)
+   ========================================================================= */
+function renderBars() {
+  const wrap = document.getElementById('bar-wrap');
+  const svgEl = document.getElementById('bar-svg');
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+
+  const margin = { top: 20, right: 30, bottom: 36, left: 130 };
+  const innerW = W - margin.left - margin.right;
+  const innerH = H - margin.top - margin.bottom;
+
+  const data = [...COUNTRY_AGG].sort((a,b) => b.totalActions - a.totalActions);
+  const maxX = Math.max(...data.map(d => d.totalActions));
+  const xMax = Math.ceil(maxX); // tight axis
+
+  const svg = d3.select(svgEl).attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+
+  // Defs: per-country bar gradient derived from the continuous severity scale
+  const defs = svg.append('defs');
+  function makeGrad(id, c1, c2) {
+    const g = defs.append('linearGradient').attr('id', id).attr('x1', '0%').attr('y1', '0%').attr('x2', '100%').attr('y2', '0%');
+    g.append('stop').attr('offset', '0%').attr('stop-color', c1).attr('stop-opacity', 0.95);
+    g.append('stop').attr('offset', '100%').attr('stop-color', c2).attr('stop-opacity', 1.0);
+  }
+  data.forEach(d => {
+    const base = severityColor(d.avgSeverity);
+    const lighter = d3.color(base).brighter(0.40).toString();
+    makeGrad(`grad-c-${slug(d.country)}`, lighter, base);
+  });
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0, xMax]).range([0, innerW]);
+  const y = d3.scaleBand().domain(data.map(d => d.country)).range([0, innerH]).padding(0.32);
+
+  // X grid
+  const xTicks = d3.ticks(0, xMax, Math.min(xMax, 6));
+  g.append('g').attr('class', 'grid')
+    .selectAll('line')
+    .data(xTicks)
+    .join('line')
+    .attr('x1', d => x(d)).attr('x2', d => x(d))
+    .attr('y1', 0).attr('y2', innerH);
+
+  // X axis
+  const xAxis = d3.axisBottom(x).ticks(Math.min(xMax, 6)).tickFormat(d3.format('d'));
+  g.append('g').attr('class', 'axis').attr('transform', `translate(0, ${innerH})`).call(xAxis);
+  g.append('text')
+    .attr('x', innerW / 2).attr('y', innerH + 30)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#64748b')
+    .style('font-family', "'Fira Code', monospace")
+    .style('font-size', '10.5px').style('letter-spacing', '1.4px')
+    .style('text-transform', 'uppercase')
+    .text('Number of Enforcement Actions');
+
+  // Y axis
+  g.append('g').attr('class', 'axis').call(d3.axisLeft(y).tickSize(0).tickPadding(10))
+    .call(g => g.select('.domain').remove());
+
+  // Bars — each bar enters with a staggered delay, sliding + fading in
+  g.selectAll('rect.bar')
+    .data(data)
+    .join('rect')
+    .attr('class', 'bar')
+    .attr('x', 0)
+    .attr('y', d => y(d.country))
+    .attr('height', y.bandwidth())
+    .attr('rx', 4)
+    .attr('width', 0)
+    .attr('opacity', 0)
+    .attr('fill', d => `url(#grad-c-${slug(d.country)})`)
+    .attr('stroke', d => d3.color(severityColor(d.avgSeverity)).darker(0.4).toString())
+    .attr('stroke-width', 0.6)
+    .on('mouseenter', function (evt, d) {
+      showTooltip(countryTooltipHTML(d.country, d, 'volume'), evt);
+    })
+    .on('mousemove', function (evt) { moveTooltip(evt); })
+    .on('mouseleave', hideTooltip)
+    .transition()
+    .delay((d, i) => i * 90)
+    .duration(900)
+    .ease(d3.easeCubicOut)
+    .attr('opacity', 1)
+    .attr('width', d => x(d.totalActions));
+
+  // Bar value labels — appear after each bar has settled
+  g.selectAll('text.bar-label')
+    .data(data)
+    .join('text')
+    .attr('class', 'bar-label')
+    .attr('y', d => y(d.country) + y.bandwidth() / 2 + 4)
+    .attr('x', d => Math.max(28, x(d.totalActions) - 8))
+    .attr('text-anchor', 'end')
+    .attr('opacity', 0)
+    .text(d => d.totalActions)
+    .transition()
+    .delay((d, i) => i * 90 + 700)
+    .duration(380)
+    .ease(d3.easeCubicOut)
+    .attr('opacity', 1);
+}
+
+/* =========================================================================
+   ENFORCEMENT REGISTER TABLE
+   ========================================================================= */
+// Jurisdictions for the register selector — sorted by total actions desc (USA first)
+const ENFORCE_COUNTRY_ORDER = [...COUNTRY_AGG]
+  .sort((a, b) => b.totalActions - a.totalActions)
+  .map(c => c.country);
+let _currentEnforceFilter = ENFORCE_COUNTRY_ORDER[0]; // default: USA
+
+function renderRegister() {
+  // 1. Render the jurisdiction selector (color-coded by each country's severity)
+  const selector = document.getElementById('enforce-country-selector');
+  if (selector) {
+    selector.innerHTML = ENFORCE_COUNTRY_ORDER.map(country => {
+      const agg    = COUNTRY_LOOKUP[country];
+      const active = country === _currentEnforceFilter;
+      const color  = severityColor(agg.avgSeverity);
+      const bg     = d3.color(color).copy({ opacity: 0.18 }).formatRgb();
+      return `
+        <button class="region-btn ${active ? 'active' : ''}" data-country="${country}"
+                style="--region-color: ${color}; --region-bg: ${bg};"
+                role="tab" aria-selected="${active}">
+          <span class="region-dot"></span>
+          ${country}
+          <span class="region-count">${agg.totalActions}</span>
+        </button>
+      `;
+    }).join('');
+    selector.querySelectorAll('.region-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _currentEnforceFilter = btn.dataset.country;
+        renderRegister();
+      });
+    });
+  }
+
+  // 2. Render the filtered table — only actions for the selected jurisdiction
+  const tbody = document.querySelector('#register tbody');
+  const rowColor = severityColor(COUNTRY_LOOKUP[_currentEnforceFilter].avgSeverity);
+  const rows = ENFORCEMENT
+    .filter(r => r.country === _currentEnforceFilter)
+    .sort((a, b) => {
+      if (b.severity !== a.severity) return b.severity - a.severity;
+      return new Date(b.date) - new Date(a.date);
+    });
+
+  tbody.innerHTML = rows.map(r => {
+    const b = severityBucket(r.severity);
+    return `
+      <tr>
+        <td class="cell-id" style="border-left: 3px solid ${rowColor}; padding-left: 12px;">${r.id}</td>
+        <td class="cell-id">${r.date}</td>
+        <td><span class="flag" aria-hidden="true">${flagFor(r.country)}</span>${r.country}</td>
+        <td>${r.regulator}</td>
+        <td><b style="color:var(--text-0); font-weight:500;">${r.entity}</b><br><span style="color:var(--text-3); font-size:11px;">${r.entityType}</span></td>
+        <td>${r.issue}<br><span style="color:var(--text-3); font-size:11px;">trigger: ${r.trigger}</span></td>
+        <td style="text-align:right;" class="num">${fmtUSD(r.penalty)}</td>
+        <td style="text-align:center;"><span class="pill ${b}">${r.severity} / 10</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/* =========================================================================
+   TAB 2 · PAYMENT ECOSYSTEM · DATA
+   ========================================================================= */
+
+/* Mobile-money transaction VOLUME by region, 2024
+   Source: Global_Mobile_Money_Dataset_2024.xlsx · sheet "Usage - Product"
+   (absolute counts of transactions) */
+const MM_VOLUME_2024 = [
+  { region: "East Asia and Pacific",           airtime: 2748687836,  bill: 913858668,   bulk: 178085064,   cashIn: 1975248838,  cashOut: 422303697,  intl: 17367907,  merchant: 2580275937, p2p: 2843300320  },
+  { region: "Europe and Central Asia",         airtime: 163031577,   bill: 46091979,    bulk: 5959827,     cashIn: 117539839,   cashOut: 71573222,   intl: 1106415,   merchant: 15471639,   p2p: 23774276    },
+  { region: "Latin America and the Caribbean", airtime: 157481784,   bill: 118071919,   bulk: 99669241,    cashIn: 178569460,   cashOut: 182213044,  intl: 6418370,   merchant: 15359005,   p2p: 276212673   },
+  { region: "South Asia",                      airtime: 3662072725,  bill: 795290379,   bulk: 456111518,   cashIn: 1896459415,  cashOut: 1263558492, intl: 4605230,   merchant: 1449778198, p2p: 4264964351  },
+  { region: "Middle East & North Africa",      airtime: 634943026,   bill: 115520856,   bulk: 4258279,     cashIn: 64029568,    cashOut: 39026159,   intl: 7763555,   merchant: 29702625,   p2p: 203749014   },
+  { region: "Sub-Saharan Africa",              airtime: 21368741066, bill: 7989673161,  bulk: 1641827606,  cashIn: 10861155348, cashOut: 8003472854, intl: 232902325, merchant: 6907017825, p2p: 23350730288 }
+];
+
+MM_VOLUME_2024.forEach(r => {
+  r.digital = r.airtime + r.bill + r.bulk + r.intl + r.merchant + r.p2p;
+  r.cash    = r.cashIn + r.cashOut;
+  r.total   = r.digital + r.cash;
+  r.digitalPct = r.digital / r.total;
+});
+
+/* Payment schemes aggregated from the enforcement dataset, by country. */
+const SCHEMES_BY_COUNTRY = {};
+ENFORCEMENT.forEach(e => {
+  (SCHEMES_BY_COUNTRY[e.country] = SCHEMES_BY_COUNTRY[e.country] || []).push({
+    name:      e.entity,
+    type:      e.entityType,
+    regulator: e.regulator,
+    issue:     e.issue,
+    year:      e.year
+  });
+});
+const COUNTRY_SCHEME_COUNT = Object.fromEntries(
+  Object.entries(SCHEMES_BY_COUNTRY).map(([k, v]) => [k, v.length])
+);
+
+/* =========================================================================
+   RTP WORLD MAP · data transcribed from the Volt PDF
+   (Real-time payments: A global view, last updated Jan 2025)
+   ========================================================================= */
+const RTP_COUNTRY_BY_ISO = {
+  // North America
+  "124":"Canada", "840":"USA",
+  // Latin America
+  "32":"Argentina", "76":"Brazil", "68":"Bolivia", "222":"El Salvador",
+  "340":"Honduras", "484":"Mexico", "604":"Peru",
+  // Asia Pacific
+  "36":"Australia", "116":"Cambodia", "96":"Brunei", "156":"China",
+  "360":"Indonesia", "392":"Japan", "398":"Kazakhstan", "458":"Malaysia",
+  "608":"Philippines", "702":"Singapore", "410":"South Korea", "158":"Taiwan",
+  "764":"Thailand", "704":"Vietnam",
+  // Europe
+  "40":"Austria", "31":"Azerbaijan", "56":"Belgium", "100":"Bulgaria",
+  "191":"Croatia", "196":"Cyprus", "203":"Czech Republic", "208":"Denmark",
+  "233":"Estonia", "246":"Finland", "250":"France", "276":"Germany",
+  "300":"Greece", "348":"Hungary", "352":"Iceland", "372":"Ireland",
+  "380":"Italy", "428":"Latvia", "440":"Lithuania", "442":"Luxembourg",
+  "528":"Netherlands", "470":"Malta", "578":"Norway", "616":"Poland",
+  "620":"Portugal", "642":"Romania", "643":"Russia", "688":"Serbia",
+  "703":"Slovakia", "705":"Slovenia", "724":"Spain", "752":"Sweden",
+  "756":"Switzerland", "792":"Turkey", "826":"UK", "804":"Ukraine",
+  // Middle East, Africa & South Asia
+  "48":"Bahrain", "818":"Egypt", "231":"Ethiopia", "288":"Ghana",
+  "356":"India", "400":"Jordan", "404":"Kenya", "414":"Kuwait",
+  "422":"Lebanon", "496":"Mongolia", "524":"Nepal", "566":"Nigeria",
+  "512":"Oman", "586":"Pakistan", "634":"Qatar", "682":"Saudi Arabia",
+  "710":"South Africa", "144":"Sri Lanka", "834":"Tanzania", "784":"UAE"
+};
+
+const RTP_REGION = {
+  NA: "North America", LATAM: "Latin America", APAC: "Asia Pacific",
+  EU:  "Europe",       MEA:   "Middle East, Africa & South Asia"
+};
+
+function _rtp(names, region) { return names.map(n => ({ name: n, region })); }
+
+const RTP_SCHEMES_BY_COUNTRY = {
+  // North America
+  "Canada":       _rtp(["Interac e-Transfer", "RTR"], RTP_REGION.NA),
+  "USA":          _rtp(["RTP", "FedNow"], RTP_REGION.NA),
+  // Latin America
+  "Argentina":    _rtp(["Transferencia 3.0"], RTP_REGION.LATAM),
+  "Brazil":       _rtp(["PIX"], RTP_REGION.LATAM),
+  "Bolivia":      _rtp(["QR BCB"], RTP_REGION.LATAM),
+  "El Salvador":  _rtp(["Transfer365"], RTP_REGION.LATAM),
+  "Honduras":     _rtp(["ACH Pronto"], RTP_REGION.LATAM),
+  "Mexico":       _rtp(["SPEI"], RTP_REGION.LATAM),
+  "Peru":         _rtp(["Immediate Interbank Transfers"], RTP_REGION.LATAM),
+  // Asia Pacific
+  "Australia":    _rtp(["New Payments Platform (NPP)"], RTP_REGION.APAC),
+  "Cambodia":     _rtp(["RFT / Bakong"], RTP_REGION.APAC),
+  "Brunei":       _rtp(["Real-Time Gross Settlements System (RTGS)"], RTP_REGION.APAC),
+  "China":        _rtp(["IBPS", "CNAPS2"], RTP_REGION.APAC),
+  "Hong Kong":    _rtp(["Faster Payment System (FPS)"], RTP_REGION.APAC),
+  "Indonesia":    _rtp(["BI-FAST"], RTP_REGION.APAC),
+  "Japan":        _rtp(["Zengin System"], RTP_REGION.APAC),
+  "Kazakhstan":   _rtp(["ISMT"], RTP_REGION.APAC),
+  "Malaysia":     _rtp(["DuitNow", "IBFT", "FPX"], RTP_REGION.APAC),
+  "Philippines":  _rtp(["InstaPay"], RTP_REGION.APAC),
+  "Singapore":    _rtp(["FAST", "PayNow"], RTP_REGION.APAC),
+  "South Korea":  _rtp(["CD/ATM", "Electronic Banking System (EBS)", "KFTC"], RTP_REGION.APAC),
+  "Taiwan":       _rtp(["Financial XML", "Interbank ATM"], RTP_REGION.APAC),
+  "Thailand":     _rtp(["PromptPay"], RTP_REGION.APAC),
+  "Vietnam":      _rtp(["NAPAS"], RTP_REGION.APAC),
+  // Europe
+  "Austria":      _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Azerbaijan":   _rtp(["IPS"], RTP_REGION.EU),
+  "Belgium":      _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Bulgaria":     _rtp(["Borica Instant Payments", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Croatia":      _rtp(["NKSInst", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Cyprus":       _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Czech Republic":_rtp(["CERTIS Instant Payments", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Denmark":      _rtp(["Straksclearing", "Nets", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Estonia":      _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Finland":      _rtp(["Siirto", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "France":       _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Germany":      _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Greece":       _rtp(["IRIS", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Hungary":      _rtp(["Azonnali fizetési rendszer (AFR)", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Iceland":      _rtp(["CBI", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Ireland":      _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Italy":        _rtp(["RTP", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Latvia":       _rtp(["EKS Zibmaksajums", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Lithuania":    _rtp(["CENTROlink", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Luxembourg":   _rtp(["BILnet", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Netherlands":  _rtp(["iDEAL", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Malta":        _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Norway":       _rtp(["Straksbetalinger", "Vipps", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Poland":       _rtp(["Express Elixir", "BlueCash", "Blik", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Portugal":     _rtp(["MBWay", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Romania":      _rtp(["Plati Instant", "Transfond Instant Payments", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Russia":       _rtp(["Fast Payments System"], RTP_REGION.EU),
+  "Serbia":       _rtp(["IPS"], RTP_REGION.EU),
+  "Slovakia":     _rtp(["SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Slovenia":     _rtp(["Flik", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Spain":        _rtp(["Bizum", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Sweden":       _rtp(["BIR", "Swish", "SCT Inst", "SEPA"], RTP_REGION.EU),
+  "Switzerland":  _rtp(["TWINT", "Swiss Interbank Clearing (SIC)"], RTP_REGION.EU),
+  "Turkey":       _rtp(["Retail Payment System (RPS)", "FAST"], RTP_REGION.EU),
+  "UK":           _rtp(["Faster Payments"], RTP_REGION.EU),
+  "Ukraine":      _rtp(["Electronic Payment System"], RTP_REGION.EU),
+  // Middle East, Africa & South Asia
+  "Bahrain":      _rtp(["Fawri+"], RTP_REGION.MEA),
+  "Egypt":        _rtp(["Instant Payment Network (IPN)"], RTP_REGION.MEA),
+  "Ethiopia":     _rtp(["EATS"], RTP_REGION.MEA),
+  "Ghana":        _rtp(["GhIPSS Instant Pay (GIP)"], RTP_REGION.MEA),
+  "India":        _rtp(["IMPS", "UPI"], RTP_REGION.MEA),
+  "Jordan":       _rtp(["Cliq"], RTP_REGION.MEA),
+  "Kenya":        _rtp(["PesaLink", "IPSL"], RTP_REGION.MEA),
+  "Kuwait":       _rtp(["Quick Pay", "NBK"], RTP_REGION.MEA),
+  "Lebanon":      _rtp(["Zaky"], RTP_REGION.MEA),
+  "Mongolia":     _rtp(["NETC"], RTP_REGION.MEA),
+  "Nepal":        _rtp(["National Payment Switch"], RTP_REGION.MEA),
+  "Nigeria":      _rtp(["NIP"], RTP_REGION.MEA),
+  "Oman":         _rtp(["MPCSS", "QMP"], RTP_REGION.MEA),
+  "Pakistan":     _rtp(["Raast", "IBFT"], RTP_REGION.MEA),
+  "Qatar":        _rtp(["QMP", "Fawran"], RTP_REGION.MEA),
+  "Saudi Arabia": _rtp(["Sarie"], RTP_REGION.MEA),
+  "South Africa": _rtp(["RTC", "PayShap"], RTP_REGION.MEA),
+  "Sri Lanka":    _rtp(["CEFTS (LankPay)"], RTP_REGION.MEA),
+  "Tanzania":     _rtp(["TIPS"], RTP_REGION.MEA),
+  "UAE":          _rtp(["IPI", "Aani"], RTP_REGION.MEA)
+};
+
+// Lat/lon for small countries that may not render at world-atlas 110m resolution
+const RTP_POINT_COORDS = {
+  "Hong Kong": [114.17, 22.32],
+  "Singapore": [103.82, 1.35],
+  "Bahrain":   [50.55,  26.07],
+  "Malta":     [14.52,  35.90]
+};
+
+function fmtVolume(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+  return String(n);
+}
+
+/* =========================================================================
+   TAB 2 · PAYMENT SCHEMES MAP (D3 + world-atlas, same zoom pattern as Tab 1)
+   ========================================================================= */
+function schemeTooltipHTML(countryName) {
+  const schemes = RTP_SCHEMES_BY_COUNTRY[countryName] || [];
+  const region  = schemes[0]?.region || '';
+  const color   = '#0ea5e9'; // uniform sky blue to match the map
+  const names   = schemes.map(s => s.name).slice(0, 3).join(', ');
+  return `
+    <div class="tt-title">
+      <span class="tt-dot" style="background:${color}; color:${color};"></span>
+      ${countryName}
+    </div>
+    <div class="tt-row"><span class="l">RTP schemes</span><span class="v" style="color:${color};">${schemes.length}</span></div>
+    <div class="tt-row"><span class="l">Region</span><span class="v" style="color:${color}; font-size:10.5px; font-weight:600; text-align:right; max-width:150px;">${region}</span></div>
+    <div class="tt-row"><span class="l">Schemes</span><span class="v" style="font-size:10.5px; font-weight:500; text-align:right; max-width:150px;">${names}${schemes.length > 3 ? ' …' : ''}</span></div>
+  `;
+}
+
+async function renderSchemeMap() {
+  const svgEl = document.getElementById('scheme-map');
+  const wrap  = document.getElementById('scheme-map-wrap');
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+
+  const svg = d3.select(svgEl).attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+
+  const resetBtn = document.getElementById('scheme-map-reset');
+  const detail   = document.getElementById('scheme-detail');
+  resetBtn.classList.remove('show');
+  detail.classList.remove('show');
+  detail.innerHTML = '';
+
+  const defs = svg.append('defs');
+  const grad = defs.append('radialGradient').attr('id', 'schemeMapGlow').attr('cx', '50%').attr('cy', '60%').attr('r', '70%');
+  grad.append('stop').attr('offset', '0%').attr('stop-color', '#ffffff').attr('stop-opacity', 0.0);
+  grad.append('stop').attr('offset', '100%').attr('stop-color', '#87aac6').attr('stop-opacity', 0.32);
+
+  let topo;
+  try { topo = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'); }
+  catch (e) { topo = await d3.json('https://unpkg.com/world-atlas@2/countries-110m.json'); }
+  const countries  = topojson.feature(topo, topo.objects.countries).features;
+  const projection = d3.geoEqualEarth().fitSize([W, H * 0.95], { type: 'Sphere' });
+  const path       = d3.geoPath(projection);
+
+  const mapRoot = svg.append('g').attr('class', 'scheme-map-root');
+  mapRoot.append('path').attr('d', path({ type: 'Sphere' })).attr('class', 'sphere');
+  mapRoot.append('path').attr('d', path(d3.geoGraticule10())).attr('class', 'graticule');
+
+  // Uniform map fill — every tracked country/point marker uses the same light blue
+  const RTP_FILL = '#0ea5e9'; // same sky blue as the "North America" pill
+  function colorForCountry(/* countryName */) { return RTP_FILL; }
+
+  const countryPaths = mapRoot.append('g')
+    .selectAll('path')
+    .data(countries)
+    .join('path')
+    .attr('d', path)
+    .attr('class', d => {
+      const tracked = RTP_COUNTRY_BY_ISO[String(+d.id)];
+      return (tracked && RTP_SCHEMES_BY_COUNTRY[tracked]) ? 'country tracked' : 'country dim bordered';
+    })
+    .attr('fill', d => {
+      const tracked = RTP_COUNTRY_BY_ISO[String(+d.id)];
+      if (!tracked || !RTP_SCHEMES_BY_COUNTRY[tracked]) return null;
+      return colorForCountry(tracked);
+    })
+    .on('mouseenter', function (evt, d) {
+      const tracked = RTP_COUNTRY_BY_ISO[String(+d.id)];
+      if (!tracked || !RTP_SCHEMES_BY_COUNTRY[tracked]) return;
+      showTooltip(schemeTooltipHTML(tracked), evt);
+    })
+    .on('mousemove', (evt) => moveTooltip(evt))
+    .on('mouseleave', hideTooltip)
+    .on('click', function (evt, d) {
+      const tracked = RTP_COUNTRY_BY_ISO[String(+d.id)];
+      if (!tracked || !RTP_SCHEMES_BY_COUNTRY[tracked]) return;
+      hideTooltip();
+      if (zoomedFeature === d) { resetZoom(); return; }
+      zoomToFeature(d, tracked);
+    });
+
+  /* Generic point markers for PDF countries too small to render as polygons at 110m */
+  const POINT_R      = 5.5;
+  const POINT_R_GLOW = 11;
+  const renderedPdfCountries = new Set();
+  countries.forEach(d => {
+    const iso = String(+d.id);
+    if (RTP_COUNTRY_BY_ISO[iso]) renderedPdfCountries.add(RTP_COUNTRY_BY_ISO[iso]);
+  });
+
+  const pointMarkers = [];
+  Object.entries(RTP_POINT_COORDS).forEach(([country, coords]) => {
+    if (!RTP_SCHEMES_BY_COUNTRY[country]) return;
+    // Only add a marker if the polygon didn't render (avoid duplicate visuals)
+    if (renderedPdfCountries.has(country)) return;
+
+    const [mx, my] = projection(coords);
+    const mColor   = colorForCountry(country);
+    const g = mapRoot.append('g').attr('class', 'point-marker');
+    const glow = g.append('circle')
+      .attr('cx', mx).attr('cy', my).attr('r', POINT_R_GLOW)
+      .attr('fill', mColor).attr('opacity', 0.30)
+      .style('pointer-events', 'none');
+    const dot = g.append('circle')
+      .attr('cx', mx).attr('cy', my).attr('r', POINT_R)
+      .attr('fill', mColor)
+      .attr('stroke', 'rgba(255,255,255,0.95)')
+      .attr('stroke-width', 1.2)
+      .attr('vector-effect', 'non-scaling-stroke')
+      .style('cursor', 'pointer')
+      .style('filter', 'drop-shadow(0 2px 5px rgba(15,23,42,0.35))')
+      .on('mouseenter', (evt) => showTooltip(schemeTooltipHTML(country), evt))
+      .on('mousemove', (evt) => moveTooltip(evt))
+      .on('mouseleave', hideTooltip)
+      .on('click', () => {
+        hideTooltip();
+        if (zoomedFeature === `POINT:${country}`) { resetZoom(); return; }
+        zoomToPoint(country, mx, my);
+      });
+    pointMarkers.push({ country, g, glow, dot, x: mx, y: my });
+  });
+
+  /* Static vignette overlay */
+  svg.append('rect').attr('width', W).attr('height', H).attr('fill', 'url(#schemeMapGlow)').style('pointer-events', 'none');
+
+  /* --- Zoom state + functions --- */
+  let zoomedFeature = null;
+
+  function sizeSchemeCardToPanel() {
+    const card = document.getElementById('scheme-map-wrap').closest('.card');
+    if (!card) return;
+    card.style.paddingBottom = '';
+    const panelRect = detail.getBoundingClientRect();
+    const cardRect  = card.getBoundingClientRect();
+    const overflow  = panelRect.bottom - cardRect.bottom;
+    if (overflow > 0) card.style.paddingBottom = (14 + overflow + 14) + 'px';
+  }
+
+  function dimAllPointMarkers(k, focusedCountry) {
+    pointMarkers.forEach(m => {
+      m.g.transition().duration(950).ease(d3.easeCubicInOut)
+        .attr('opacity', m.country === focusedCountry ? 1 : 0.22);
+      m.dot.transition().duration(950).attr('r', POINT_R / k);
+      m.glow.transition().duration(950).attr('r', POINT_R_GLOW / k);
+    });
+  }
+
+  function zoomToFeature(feature, countryName) {
+    const [[x0, y0], [x1, y1]] = path.bounds(feature);
+    const dx = Math.max(1, x1 - x0);
+    const dy = Math.max(1, y1 - y0);
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
+    const PANEL_RESERVED = 340;
+    const effectiveW = Math.max(140, W - PANEL_RESERVED);
+    const kFit = Math.min(0.82 * effectiveW / dx, 0.82 * H / dy);
+    const k    = Math.max(1.8, Math.min(10, kFit));
+    const tx = effectiveW / 2 - cx * k;
+    const ty = H / 2 - cy * k;
+
+    mapRoot.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('transform', `translate(${tx}, ${ty}) scale(${k})`);
+    countryPaths.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('opacity', d => d === feature ? 1 : 0.22);
+    dimAllPointMarkers(k, null);
+
+    resetBtn.classList.add('show');
+    renderSchemeDetail(countryName);
+    zoomedFeature = feature;
+  }
+
+  function zoomToPoint(country, px, py) {
+    const k = 6;
+    const PANEL_RESERVED = 340;
+    const effectiveW = Math.max(140, W - PANEL_RESERVED);
+    const tx = effectiveW / 2 - px * k;
+    const ty = H / 2 - py * k;
+
+    mapRoot.transition().duration(950).ease(d3.easeCubicInOut)
+      .attr('transform', `translate(${tx}, ${ty}) scale(${k})`);
+    countryPaths.transition().duration(950).ease(d3.easeCubicInOut).attr('opacity', 0.22);
+    dimAllPointMarkers(k, country);
+
+    resetBtn.classList.add('show');
+    renderSchemeDetail(country);
+    zoomedFeature = `POINT:${country}`;
+  }
+
+  function resetZoom() {
+    mapRoot.transition().duration(900).ease(d3.easeCubicInOut).attr('transform', 'translate(0,0) scale(1)');
+    countryPaths.transition().duration(900).ease(d3.easeCubicInOut).attr('opacity', 1);
+    pointMarkers.forEach(m => {
+      m.g.transition().duration(900).ease(d3.easeCubicInOut).attr('opacity', 1);
+      m.dot.transition().duration(900).attr('r', POINT_R);
+      m.glow.transition().duration(900).attr('r', POINT_R_GLOW);
+    });
+    resetBtn.classList.remove('show');
+    detail.classList.remove('show');
+    // Reset card padding so the page shrinks back to normal
+    const _card = document.getElementById('scheme-map-wrap').closest('.card');
+    if (_card) _card.style.paddingBottom = '';
+    setTimeout(() => { if (!detail.classList.contains('show')) detail.innerHTML = ''; }, 360);
+    zoomedFeature = null;
+  }
+
+  function renderSchemeDetail(countryName) {
+    const schemes = RTP_SCHEMES_BY_COUNTRY[countryName] || [];
+    const region  = schemes[0]?.region || '';
+    const color   = colorForCountry(countryName);
+    detail.innerHTML = `
+      <div class="cd-header">
+        <div>
+          <div class="cd-title"><span class="flag" aria-hidden="true">${flagFor(countryName)}</span>${countryName}</div>
+          <div class="cd-sub">${schemes.length} real-time payment scheme${schemes.length === 1 ? '' : 's'} · <span style="color:${color}; font-weight:600;">${region}</span></div>
+        </div>
+        <button class="cd-close" id="scheme-cd-close" aria-label="Close detail panel">×</button>
+      </div>
+      <div class="cd-list-header">Real-Time Payment Schemes · ${countryName}</div>
+      <ul class="cd-actions">
+        ${schemes.map(s => `
+          <li style="border-left: 3px solid ${color};">
+            <div class="a-entity" style="margin-top:0;">${s.name}</div>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+    detail.classList.add('show');
+    document.getElementById('scheme-cd-close').onclick = resetZoom;
+    // Grow the scheme-map card to fit the panel so it doesn't cover content below
+    requestAnimationFrame(sizeSchemeCardToPanel);
+  }
+
+  resetBtn.onclick = resetZoom;
+}
+
+/* =========================================================================
+   TAB 2 · DIGITAL vs CASH CHART
+   100%-stacked horizontal bars per GSMA region
+   ========================================================================= */
+function dcTooltip(d) {
+  return `
+    <div class="tt-title">
+      <span class="tt-dot" style="background:#22d3ee; color:#22d3ee;"></span>
+      ${d.region}
+    </div>
+    <div class="tt-row"><span class="l">Digital rails</span><span class="v" style="color:#22d3ee;">${fmtVolume(d.digital)} (${Math.round(d.digitalPct*100)}%)</span></div>
+    <div class="tt-row"><span class="l">Cash-in / out</span><span class="v" style="color:#f59e0b;">${fmtVolume(d.cash)} (${Math.round((1-d.digitalPct)*100)}%)</span></div>
+    <div class="tt-row"><span class="l">Total volume</span><span class="v">${fmtVolume(d.total)}</span></div>
+  `;
+}
+
+function renderDigitalCashChart() {
+  const wrap  = document.getElementById('dc-chart-wrap');
+  const svgEl = document.getElementById('dc-chart');
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+
+  const data = [...MM_VOLUME_2024].sort((a, b) => b.total - a.total);
+  const margin = { top: 16, right: 78, bottom: 16, left: 180 };
+  const innerW = W - margin.left - margin.right;
+  const innerH = H - margin.top - margin.bottom;
+
+  const svg = d3.select(svgEl).attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+
+  const defs = svg.append('defs');
+  function makeGrad(id, c1, c2) {
+    const g = defs.append('linearGradient').attr('id', id).attr('x1','0%').attr('y1','0%').attr('x2','100%').attr('y2','0%');
+    g.append('stop').attr('offset', '0%').attr('stop-color', c1).attr('stop-opacity', 0.90);
+    g.append('stop').attr('offset', '100%').attr('stop-color', c2).attr('stop-opacity', 1.0);
+  }
+  makeGrad('grad-digital', '#0ea5e9', '#22d3ee');
+  makeGrad('grad-cash',    '#b45309', '#f59e0b');
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+  const y = d3.scaleBand().domain(data.map(d => d.region)).range([0, innerH]).padding(0.34);
+
+  g.append('g').selectAll('text.dc-region-label').data(data).join('text')
+    .attr('class', 'dc-region-label')
+    .attr('x', -12).attr('y', d => y(d.region) + y.bandwidth() / 2 + 4)
+    .attr('text-anchor', 'end')
+    .text(d => d.region);
+
+  g.append('g').selectAll('text.dc-total-label').data(data).join('text')
+    .attr('class', 'dc-total-label')
+    .attr('x', innerW + 10).attr('y', d => y(d.region) + y.bandwidth() / 2 + 4)
+    .attr('text-anchor', 'start')
+    .text(d => fmtVolume(d.total));
+
+  const rows = g.append('g').selectAll('g.dc-row').data(data).join('g').attr('class', 'dc-row')
+    .attr('transform', d => `translate(0, ${y(d.region)})`);
+
+  rows.append('rect').attr('class', 'dc-bar digital')
+    .attr('x', 0).attr('y', 0).attr('height', y.bandwidth()).attr('rx', 4).attr('width', 0)
+    .on('mouseenter', function (evt, d) { showTooltip(dcTooltip(d), evt); })
+    .on('mousemove', (evt) => moveTooltip(evt))
+    .on('mouseleave', hideTooltip)
+    .transition().duration(950).ease(d3.easeCubicOut)
+    .attr('width', d => d.digitalPct * innerW);
+
+  rows.append('rect').attr('class', 'dc-bar cash')
+    .attr('x', d => d.digitalPct * innerW).attr('y', 0).attr('height', y.bandwidth()).attr('rx', 4).attr('width', 0)
+    .on('mouseenter', function (evt, d) { showTooltip(dcTooltip(d), evt); })
+    .on('mousemove', (evt) => moveTooltip(evt))
+    .on('mouseleave', hideTooltip)
+    .transition().delay(300).duration(700).ease(d3.easeCubicOut)
+    .attr('width', d => (1 - d.digitalPct) * innerW);
+
+  // Percentage labels inside each segment (only if segment is wide enough)
+  rows.append('text').attr('class', 'dc-pct-label')
+    .attr('x', d => (d.digitalPct * innerW) / 2)
+    .attr('y', y.bandwidth() / 2 + 4)
+    .attr('text-anchor', 'middle').attr('opacity', 0)
+    .text(d => d.digitalPct > 0.14 ? `${Math.round(d.digitalPct * 100)}%` : '')
+    .transition().delay(900).duration(400).attr('opacity', 1);
+
+  rows.append('text').attr('class', 'dc-pct-label')
+    .attr('x', d => d.digitalPct * innerW + ((1 - d.digitalPct) * innerW) / 2)
+    .attr('y', y.bandwidth() / 2 + 4)
+    .attr('text-anchor', 'middle').attr('opacity', 0)
+    .text(d => (1 - d.digitalPct) > 0.10 ? `${Math.round((1 - d.digitalPct) * 100)}%` : '')
+    .transition().delay(900).duration(400).attr('opacity', 1);
+}
+
+/* =========================================================================
+   TAB 2 · SCHEMES REGISTER TABLE
+   ========================================================================= */
+const REGION_COLORS = {
+  [RTP_REGION.NA]:     '#0ea5e9', // sky
+  [RTP_REGION.LATAM]:  '#10b981', // emerald
+  [RTP_REGION.APAC]:   '#f59e0b', // amber
+  [RTP_REGION.EU]:     '#a855f7', // purple
+  [RTP_REGION.MEA]:    '#ec4899'  // pink
+};
+const REGION_ORDER = [RTP_REGION.NA, RTP_REGION.LATAM, RTP_REGION.APAC, RTP_REGION.EU, RTP_REGION.MEA];
+let _currentRegionFilter = RTP_REGION.NA; // default selection
+
+function renderSchemeRegister() {
+  // 1. Count COUNTRIES per region (one row per country now)
+  const regionCounts = {};
+  Object.values(RTP_SCHEMES_BY_COUNTRY).forEach(schemes => {
+    const region = schemes[0]?.region;
+    if (region) regionCounts[region] = (regionCounts[region] || 0) + 1;
+  });
+
+  // 2. Render the region selector pills (color-coded)
+  const selector = document.getElementById('scheme-region-selector');
+  if (selector) {
+    selector.innerHTML = REGION_ORDER.map(r => {
+      const active = r === _currentRegionFilter;
+      const color  = REGION_COLORS[r];
+      const bg = color + '2E';
+      return `
+        <button class="region-btn ${active ? 'active' : ''}" data-region="${r}"
+                style="--region-color: ${color}; --region-bg: ${bg};"
+                role="tab" aria-selected="${active}">
+          <span class="region-dot"></span>
+          ${r}
+          <span class="region-count">${regionCounts[r] || 0}</span>
+        </button>
+      `;
+    }).join('');
+    selector.querySelectorAll('.region-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _currentRegionFilter = btn.dataset.region;
+        renderSchemeRegister();
+      });
+    });
+  }
+
+  // 3. Render table — ONE ROW PER COUNTRY within the selected region,
+  //    sorted by country, with all its schemes grouped alphabetically in one cell.
+  const tbody = document.querySelector('#scheme-register tbody');
+  const color = REGION_COLORS[_currentRegionFilter];
+
+  const countriesInRegion = Object.entries(RTP_SCHEMES_BY_COUNTRY)
+    .filter(([, schemes]) => schemes[0]?.region === _currentRegionFilter)
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  tbody.innerHTML = countriesInRegion.map(([country, schemes]) => {
+    const sortedNames = [...schemes]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(s => s.name)
+      .join(', ');
+    return `
+      <tr>
+        <td style="border-left: 3px solid ${color}; padding-left: 12px; white-space: nowrap;">
+          <span class="flag" aria-hidden="true">${flagFor(country)}</span><b style="color:var(--text-0); font-weight:600;">${country}</b>
+        </td>
+        <td>${sortedNames}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/* =========================================================================
+   TAB SWITCHING
+   ========================================================================= */
+let ecoRendered = false;
+function setupTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-pane').forEach(p => {
+        p.classList.remove('active');
+        p.hidden = true;
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      const pane = document.getElementById(target);
+      pane.classList.add('active');
+      pane.hidden = false;
+
+      if (target === 'tab-ecosystem' && !ecoRendered) {
+        renderSchemeMap();
+        renderDigitalCashChart();
+        renderSchemeRegister();
+        ecoRendered = true;
+      } else if (target === 'tab-ecosystem') {
+        // Re-render in case the pane was resized while hidden
+        renderSchemeMap();
+        renderDigitalCashChart();
+      } else if (target === 'tab-enforcement') {
+        // Re-play Tab 01's chart + map animations every time the user returns to it
+        renderMap();
+        renderBars();
+      }
+    });
+  });
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+function init() {
+  renderLegend();
+  renderMap();
+  renderBars();
+  renderRegister();
+  setupTabs();
+}
+init();
+
+// Re-render on resize (debounced) — always re-render Tab 1; re-render Tab 2 only if the pane has been opened once
+let rt;
+window.addEventListener('resize', () => {
+  clearTimeout(rt);
+  rt = setTimeout(() => {
+    renderMap();
+    renderBars();
+    if (ecoRendered) {
+      renderSchemeMap();
+      renderDigitalCashChart();
+    }
+  }, 180);
+});
+</script>
+
+<div id="site-footer"></div>
+<script src="../nav.js"></script>
+
+</body>
+</html>

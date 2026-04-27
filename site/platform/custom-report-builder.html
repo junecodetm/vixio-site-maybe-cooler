@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Custom Report Builder — Vixio Platform</title>
+<meta name="description" content="Build the reports your board, your audit team, and your regulators actually want.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* Pre-hide the report-builder animation targets BEFORE motion.js runs,
+     so users never see the full report flash in then disappear.
+     We use display:none (not opacity:0) for sections so hidden sections
+     take ZERO layout space — that lets the report grow as each section
+     is added below the previous one (cumulative reveal). */
+  .builder-section[data-section] { display: none; }
+  .builder-progress-bar { width: 0%; }
+  .builder-file { opacity: 0; transform: translateY(8px) scale(0.92); }
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<div class="container"><div class="breadcrumb"><a href="../../index.html">Home</a> <span class="sep">/</span> <a href="index.html">Platform</a> <span class="sep">/</span> Custom Report Builder</div></div>
+
+<section class="hero hero-dark" style="padding-top: clamp(32px, 5vw, 64px);">
+  <div class="hero-particles"><span></span><span></span><span></span></div>
+  <div class="container">
+    <div class="hero-split">
+      <div class="reveal">
+        <span class="eyebrow">Platform · Report Builder</span>
+        <h1>The report your board <em>actually reads.</em></h1>
+        <p class="hero-sub">Drag-and-drop regulatory, market, and workflow data into the exact format your stakeholders want. Schedule. Distribute. Done.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-light" href="../about/contact.html">See it live <span class="arr">→</span></a>
+          <a class="btn btn-outline-light" href="index.html">Back to platform</a>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="dashboard">
+          <div class="dashboard-inner">
+            <div class="dashboard-chrome"><div class="dots"><span></span><span></span><span></span></div><div class="url">Report · Q2 Board Pack</div><div style="width:54px"></div></div>
+            <!-- min-height reserves the full final-state height upfront so
+                 the panel does NOT grow as sections accumulate during the
+                 cursor animation. Measured: full content with all 4 sections
+                 revealed = ~714px; min-height 720px gives a small buffer. -->
+            <div style="padding:20px; min-height:720px;">
+              <!-- Tab row: 4 builder tabs (no +Add) -->
+              <div class="builder-tab-row" style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                <span class="chip builder-tab" data-tab="exec"      style="font-size:.68rem; cursor:pointer;">Exec summary</span>
+                <span class="chip builder-tab" data-tab="kpis"      style="font-size:.68rem; cursor:pointer;">KPIs</span>
+                <span class="chip builder-tab" data-tab="regs"      style="font-size:.68rem; cursor:pointer;">Regs map</span>
+                <span class="chip builder-tab" data-tab="incidents" style="font-size:.68rem; cursor:pointer;">Incidents</span>
+              </div>
+              <!-- Preview card -->
+              <div style="background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 16px; min-height: 590px;">
+                <div style="font-family:var(--font-display); color:white; font-size:1.3rem; letter-spacing:-.02em;">Compliance Board Pack · Q2 2026</div>
+                <div style="font-family:var(--font-mono); font-size:.72rem; color:rgba(255,255,255,.4); margin-bottom:16px;">Prepared by Regulatory Affairs · Jul 4 2026</div>
+
+                <!-- Section: Executive summary text -->
+                <div class="builder-section builder-section--exec" data-section="exec">
+                  Executive summary — Vixio tracked 42 material regulatory changes across our operating jurisdictions this quarter. Key focus areas: MiCA stablecoin implementation, DORA TLPT scope clarification, and PSD3 transposition deadlines. Aggregate enforcement exposure remained within board-approved tolerance.
+                </div>
+
+                <!-- Section: KPIs grid -->
+                <div class="builder-section builder-section--kpis" data-section="kpis">
+                  <div style="background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:10px; padding:12px;"><div style="font-family:var(--font-display); font-size:1.6rem; color:white; letter-spacing:-.03em; line-height:1;">42</div><div style="font-size:.72rem; color:rgba(255,255,255,.55); margin-top:4px;">Changes tracked</div></div>
+                  <div style="background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2); border-radius:10px; padding:12px;"><div style="font-family:var(--font-display); font-size:1.6rem; color:white; letter-spacing:-.03em; line-height:1;">38</div><div style="font-size:.72rem; color:rgba(255,255,255,.55); margin-top:4px;">Closed on time</div></div>
+                  <div style="background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); border-radius:10px; padding:12px;"><div style="font-family:var(--font-display); font-size:1.6rem; color:white; letter-spacing:-.03em; line-height:1;">4</div><div style="font-size:.72rem; color:rgba(255,255,255,.55); margin-top:4px;">At risk</div></div>
+                </div>
+
+                <!-- Section: Regs map (jurisdiction chips) -->
+                <div class="builder-section builder-section--regs" data-section="regs">
+                  <div style="font-family:var(--font-mono); font-size:.7rem; color:rgba(255,255,255,.5); letter-spacing:.12em; text-transform:uppercase;">Active jurisdictions · 12</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:6px; color:#C7D2FE;">EU · MiCA</span>
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:6px; color:#C7D2FE;">UK · FCA</span>
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:6px; color:#C7D2FE;">US · CFPB</span>
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:6px; color:#C7D2FE;">SG · MAS</span>
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:6px; color:#C7D2FE;">DE · BaFin</span>
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(80,70,229,.1); border:1px solid rgba(80,70,229,.25); border-radius:6px; color:#C7D2FE;">AU · ASIC</span>
+                    <span style="font-family:var(--font-mono); font-size:.72rem; padding:4px 10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:6px; color:rgba(255,255,255,.6);">+6 more</span>
+                  </div>
+                </div>
+
+                <!-- Section: Incidents register -->
+                <div class="builder-section builder-section--incidents" data-section="incidents">
+                  <div style="font-family:var(--font-mono); font-size:.7rem; color:rgba(255,255,255,.5); letter-spacing:.12em; text-transform:uppercase;">Risk register · 4 at risk</div>
+                  <div style="display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:8px 10px; background:rgba(248,113,113,.06); border-left:2px solid rgba(248,113,113,.55); border-radius:4px; font-size:.78rem;">
+                    <span style="font-family:var(--font-mono); color:#FCA5A5; font-weight:600;">HIGH</span>
+                    <span style="color:rgba(255,255,255,.85);">MiCA stablecoin reserve check</span>
+                    <span style="font-family:var(--font-mono); color:rgba(255,255,255,.45);">Feb 14</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:8px 10px; background:rgba(245,158,11,.06); border-left:2px solid rgba(245,158,11,.5); border-radius:4px; font-size:.78rem;">
+                    <span style="font-family:var(--font-mono); color:#FCD34D; font-weight:600;">MED</span>
+                    <span style="color:rgba(255,255,255,.85);">DORA TLPT scope clarification</span>
+                    <span style="font-family:var(--font-mono); color:rgba(255,255,255,.45);">Feb 28</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:8px 10px; background:rgba(245,158,11,.06); border-left:2px solid rgba(245,158,11,.5); border-radius:4px; font-size:.78rem;">
+                    <span style="font-family:var(--font-mono); color:#FCD34D; font-weight:600;">MED</span>
+                    <span style="color:rgba(255,255,255,.85);">PSD3 transposition deadline</span>
+                    <span style="font-family:var(--font-mono); color:rgba(255,255,255,.45);">Mar 03</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Download row: button + file output (no visible progress
+                   bar track — the loading feedback is on the button itself
+                   via .is-active glow, then the file pops in). The file
+                   pill sits right next to the button (gap: 14px). -->
+              <div class="builder-download-row" style="margin-top:14px; display:flex; align-items:center; gap:14px; min-height: 36px;">
+                <button class="builder-download-btn" type="button" id="builderDownloadBtn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Download report</span>
+                </button>
+                <div class="builder-file" id="builderFile">
+                  <svg width="12" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span>Q2-Board-Pack.pdf</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow no-dot">What it does</span><h2>From raw data to board pack in minutes.</h2></div>
+    <div class="cards cols-3 reveal reveal-stagger">
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div><h3>Drag-and-drop blocks</h3><p>Executive summary, heat maps, KPI tiles, tables, commentary — drop any block on a page.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><h3>Scheduled delivery</h3><p>Monthly board pack? Weekly regulator report? Set the cadence once and it lands in the inbox.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div><h3>Any format</h3><p>PDF, PowerPoint, HTML, or direct push to SharePoint, Google Drive, or Confluence.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-ink">
+  <div class="container">
+    <div class="section-head reveal" style="margin-bottom:48px">
+      <span class="eyebrow light no-dot">Built on the Vixio data layer</span>
+      <h2>Reports powered by the broadest regulatory dataset in the industry.</h2>
+    </div>
+    <div class="stats reveal">
+      <div><div class="stat-num"><span data-count="4" data-suffix="M+">0</span></div><div class="stat-label">Forecasting datapoints</div></div>
+      <div><div class="stat-num"><span data-count="1400" data-suffix="+">0</span></div><div class="stat-label">Regulatory authorities</div></div>
+      <div><div class="stat-num"><span data-count="2000" data-suffix="+">0</span></div><div class="stat-label">Sources monitored daily</div></div>
+      <div><div class="stat-num"><span data-count="200" data-suffix="+">0</span></div><div class="stat-label">Jurisdictions</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow no-dot">Five reasons teams switch</span>
+      <h2>From manual spreadsheet misery to a tailored report in minutes.</h2>
+      <p>Build exactly what your board, audit team, or regulator needs — pulled directly from Vixio's Regulatory Library and Data Hub, with expert analysis already attached.</p>
+    </div>
+    <div class="cards cols-3 reveal reveal-stagger">
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><h3>Save hours of manual work</h3><p>Build tailored reports directly from Vixio's intelligence — no more copy-paste from multiple sources.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M12 3a14 14 0 010 18"/><circle cx="12" cy="12" r="9"/></svg></div><h3>Clarity instantly</h3><p>Side-by-side comparisons of regulations and analyst commentary — the full picture, one report.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-4 9-8 10-4-1-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Confident decisions</h3><p>Pull exactly the information you need into one trusted view — board-ready and defensible.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div><h3>Reduce costs</h3><p>Eliminate manual research and external consultant spend on reports you should own in-house.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12a8 8 0 0116 0M4 12a8 8 0 0016 0M12 4v16"/></svg></div><h3>Share seamlessly</h3><p>Export reports as Excel, PDF, PowerPoint, or HTML, or push to SharePoint, Google Drive, or Confluence.</p></div>
+      <div class="card reveal"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div><h3>Scheduled delivery</h3><p>Set the cadence once — weekly board pack, monthly regulator report — and it lands in the inbox.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-alt">
+  <div class="container">
+    <div class="testimonial reveal">
+      <blockquote>Since we implemented the Vixio platform, I've seen tangible improvements — including the reduction of the time spent on finding information, on understanding changes, and on presenting those changes to me or to the board.</blockquote>
+      <div class="attrib">
+        <div>
+          <strong>Tommaso Di Chio</strong><br>
+          <span>Chief Legal &amp; Compliance Officer, Bragg — on streamlining compliance across 20+ licences with Vixio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal center">
+      <span class="eyebrow no-dot">FAQ</span>
+      <h2>How teams use Report Builder.</h2>
+    </div>
+    <div class="faq reveal">
+      <details class="faq-item"><summary>What data sources feed Report Builder?</summary><p>Vixio's Regulatory Library (source regulations), Data Hub (structured datapoints), and analyst commentary — all citation-linked.</p></details>
+      <details class="faq-item"><summary>What export formats are supported?</summary><p>Excel, PDF, PowerPoint, and HTML — with direct push to SharePoint, Google Drive, and Confluence.</p></details>
+      <details class="faq-item"><summary>Can I schedule recurring reports?</summary><p>Yes. Daily, weekly, monthly, or quarterly cadences with auto-delivery to distribution lists.</p></details>
+      <details class="faq-item"><summary>Which sectors are covered?</summary><p>Gambling, Payments, Banking, and Digital Assets — with sector-specific blocks and data tables.</p></details>
+    </div>
+  </div>
+</section>
+
+<section><div class="container"><div class="cta-band reveal"><h2>Stop rebuilding the same report every month.</h2><p>Let us show you how 30-second reports actually work.</p><a class="btn btn-light" href="https://calendly.com/vixio-demonstration/vixio-regulatory-intelligence-discovery-call" target="_blank" rel="noopener" data-cta="book-demo">Book a demo <span class="arr">→</span></a></div></div></section>
+
+<div id="site-footer"></div>
+<script src="../nav.js"></script>
+</body></html>

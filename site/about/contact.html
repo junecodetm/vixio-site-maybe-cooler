@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact Vixio — Book a regulatory intelligence briefing</title>
+<meta name="description" content="Book a 30-minute intelligence briefing tailored to your sector, markets, and workflows. Offices in London and Washington DC. Email info@vixio.com.">
+<meta name="theme-color" content="#0A0A14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<section class="hero">
+  <div class="container-wide">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../../index.html">Home</a> <span>/</span> <a href="./index.html">About</a> <span>/</span> <span>Contact</span>
+    </nav>
+
+    <div class="hero-split">
+      <div>
+        <div class="hero-eyebrow-row reveal">
+          <span class="eyebrow">Book a briefing</span>
+        </div>
+        <h1 class="hero-headline reveal">Let's tailor the <em>briefing</em><br>to your actual<br>regulatory program.</h1>
+        <p class="hero-lede reveal">30 minutes. Your sector, your jurisdictions, your workflows. Our analyst team instead of a scripted sales deck.</p>
+
+        <ul class="checks mt-32 reveal">
+          <li>A live walkthrough of the platform loaded with your markets.</li>
+          <li>Answers to the specific regulatory questions your team is stuck on.</li>
+          <li>A candid view on where Vixio fits — and where it doesn't — in your stack.</li>
+          <li>Direct access to our analyst desk for follow-up questions.</li>
+        </ul>
+
+        <div class="mt-40 reveal" style="padding-top: 32px; border-top: 1px solid var(--hairline);">
+          <div class="mono-label" style="margin-bottom: 12px;">Direct channels</div>
+          <div style="display: grid; gap: 8px; font-size: 14.5px;">
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <span class="mono-sm" style="color: var(--accent-400); min-width: 80px;">Email</span>
+              <a href="mailto:info@vixio.com" style="color: var(--ink-9);">info@vixio.com</a>
+            </div>
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <span class="mono-sm" style="color: var(--accent-400); min-width: 80px;">Calendar</span>
+              <a href="https://calendly.com/vixio-demonstration/vixio-regulatory-intelligence-discovery-call" target="_blank" rel="noopener" style="color: var(--ink-9);">Book directly via Calendly</a>
+            </div>
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <span class="mono-sm" style="color: var(--accent-400); min-width: 80px;">Response</span>
+              <span style="color: var(--ink-8);">Within one business day</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="form-card reveal"
+            id="briefing-form"
+            action="https://www.vixio.com/contact-us"
+            method="post"
+            target="_blank"
+            data-fallback-mailto="briefings@vixio.com"
+            aria-label="Book a briefing">
+        <span class="mono-label">Request a briefing</span>
+        <h4 class="mt-12">Which industries apply?</h4>
+        <div class="industry-pills" role="group" aria-label="Industry selection">
+          <button type="button" data-industry="gambling"       aria-pressed="true"  class="on">Gambling</button>
+          <button type="button" data-industry="payments"       aria-pressed="false">Payments</button>
+          <button type="button" data-industry="banking"        aria-pressed="false">Banking</button>
+          <button type="button" data-industry="digital-assets" aria-pressed="false">Digital Assets</button>
+        </div>
+        <input type="hidden" name="industries" id="briefing-industries" value="gambling">
+
+        <div class="form-row mt-12">
+          <div class="field"><label for="bf-first">First name</label><input type="text" name="first_name" id="bf-first" autocomplete="given-name" required></div>
+          <div class="field"><label for="bf-last">Last name</label><input type="text" name="last_name" id="bf-last" autocomplete="family-name" required></div>
+        </div>
+        <div class="field"><label for="bf-email">Work email</label><input type="email" name="email" id="bf-email" autocomplete="email" required></div>
+        <div class="form-row">
+          <div class="field"><label for="bf-company">Company</label><input type="text" name="company" id="bf-company" autocomplete="organization" required></div>
+          <div class="field"><label for="bf-title">Job title</label><input type="text" name="job_title" id="bf-title" autocomplete="organization-title" required></div>
+        </div>
+        <div class="field">
+          <label for="bf-source">How did you hear about us?</label>
+          <select name="source" id="bf-source">
+            <option value="search">Online search</option>
+            <option value="referral">Referral</option>
+            <option value="event">Industry event</option>
+            <option value="news">Regulatory news</option>
+            <option value="social">Social media</option>
+            <option value="email">Email</option>
+            <option value="ai">AI search / assistant</option>
+            <option value="review">Review site</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <!-- UTM / campaign context (populated from URL params on submit) -->
+        <input type="hidden" name="utm_source"   value="">
+        <input type="hidden" name="utm_medium"   value="">
+        <input type="hidden" name="utm_campaign" value="">
+        <input type="hidden" name="utm_content"  value="">
+        <input type="hidden" name="utm_term"     value="">
+        <input type="hidden" name="heeet_data"   value="">
+        <input type="hidden" name="heeet_content" value="">
+        <input type="hidden" name="page_source"  value="contact">
+
+        <button class="btn btn-primary mt-16" type="submit" style="width:100%;justify-content:center">
+          Request your briefing <span class="arr">→</span>
+        </button>
+
+        <p style="font-size: .78rem; color: var(--ink-6); margin-top: 14px; line-height: 1.55;">
+          By submitting you agree to our <a href="https://www.vixio.com/privacy-policy" target="_blank" rel="noopener" style="color: var(--accent-300);">Privacy Policy</a>. We'll use your details only to arrange the briefing.
+        </p>
+      </form>
+
+      <script>
+        (function(){
+          var form = document.getElementById('briefing-form');
+          if (!form) return;
+
+          // Industry pills — keep aria-pressed + hidden input in sync; multi-select
+          var pills = form.querySelectorAll('.industry-pills [data-industry]');
+          var hidden = document.getElementById('briefing-industries');
+          function syncIndustries() {
+            var picked = Array.from(pills)
+              .filter(function(p){ return p.getAttribute('aria-pressed') === 'true'; })
+              .map(function(p){ return p.dataset.industry; });
+            hidden.value = picked.join(',');
+          }
+          pills.forEach(function(p){
+            p.addEventListener('click', function(){
+              var on = p.getAttribute('aria-pressed') === 'true';
+              p.setAttribute('aria-pressed', on ? 'false' : 'true');
+              p.classList.toggle('on', !on);
+              syncIndustries();
+            });
+          });
+          syncIndustries();
+
+          // Populate UTM params from current URL
+          var params = new URLSearchParams(window.location.search);
+          ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','heeet_data','heeet_content'].forEach(function(k){
+            var input = form.querySelector('input[name="'+k+'"]');
+            if (input && params.get(k)) input.value = params.get(k);
+          });
+
+          // Submit handler: optimistic success; analytics event; open mailto fallback in a new tab if offline
+          form.addEventListener('submit', function(ev){
+            ev.preventDefault();
+            var data = new FormData(form);
+            if (window.gtag) {
+              window.gtag('event', 'generate_lead', {
+                form: 'briefing',
+                industries: data.get('industries') || '',
+                source: data.get('source') || ''
+              });
+            }
+            // Open mailto in background as audit trail for now (until backend endpoint live)
+            try {
+              var lines = [];
+              ['first_name','last_name','email','company','job_title','industries','source'].forEach(function(k){
+                var v = data.get(k); if (v) lines.push(k + ': ' + v);
+              });
+              var body  = encodeURIComponent(lines.join('\n'));
+              var subj  = encodeURIComponent('Briefing request · ' + (data.get('company') || ''));
+              var mail  = 'mailto:' + form.dataset.fallbackMailto + '?subject=' + subj + '&body=' + body;
+              // Silent mailto via iframe — doesn't steal focus from the success state
+              var ifr = document.createElement('iframe');
+              ifr.style.display = 'none';
+              ifr.src = mail;
+              document.body.appendChild(ifr);
+              setTimeout(function(){ ifr.remove(); }, 4000);
+            } catch (e) {}
+
+            // Success state
+            var btn = form.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Received ✓ · we\'ll be in touch';
+            btn.disabled = true;
+            form.querySelectorAll('input, select, button[type="button"]').forEach(function(el){ el.disabled = true; });
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= LIVE CALENDLY EMBED ============= -->
+<section class="section bg-paper">
+  <div class="container-wide">
+    <div class="section-head section-head--center reveal">
+      <span class="eyebrow">Prefer to book instantly?</span>
+      <h2 class="mt-24 draw-line">Pick a slot with our analyst team.</h2>
+      <p class="lead mt-20">Skip the form. Grab 30 minutes directly on our calendar — we'll tailor it to your sector when we meet.</p>
+    </div>
+
+    <div class="calendly-host reveal mt-48">
+      <div class="calendly-inline-widget"
+           data-url="https://calendly.com/vixio-demonstration/vixio-regulatory-intelligence-discovery-call?hide_gdpr_banner=1&primary_color=37B8CB&text_color=191818"
+           style="min-width:320px;height:760px;"></div>
+      <noscript>
+        <p style="text-align:center; padding:32px;">
+          <a class="btn btn-primary" data-magnet href="https://calendly.com/vixio-demonstration/vixio-regulatory-intelligence-discovery-call" target="_blank" rel="noopener">Open Calendly <span class="arr">→</span></a>
+        </p>
+      </noscript>
+    </div>
+    <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  </div>
+</section>
+
+
+<!-- ============= OFFICES ============= -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Where we are</span>
+      <h2 class="mt-24 draw-line">Offices in London and Washington DC.</h2>
+      <p class="lead mt-20">Analyst desk operating across multiple time zones. Global coverage, regional depth.</p>
+    </div>
+
+    <div class="grid-3 mt-32 reveal">
+      <div class="panel">
+        <div class="mono-label" style="color: var(--accent-400);">Headquarters</div>
+        <h3 class="mt-12">London, UK</h3>
+        <p style="font-size: 14px; color: var(--ink-8); margin-top: 8px;">European analyst desk. Payments, banking, and global-gambling coverage.</p>
+      </div>
+      <div class="panel">
+        <div class="mono-label" style="color: var(--accent-400);">Since 2010</div>
+        <h3 class="mt-12">Washington DC, USA</h3>
+        <p style="font-size: 14px; color: var(--ink-8); margin-top: 8px;">Americas desk. US state-by-state gambling and federal financial services.</p>
+      </div>
+      <div class="panel">
+        <div class="mono-label" style="color: var(--accent-400);">Global analyst desk</div>
+        <h3 class="mt-12">Always on</h3>
+        <p style="font-size: 14px; color: var(--ink-8); margin-top: 8px;">Follow-the-sun coverage. Regulatory events captured and classified the day they publish.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= LIGHT CTA ============= -->
+<section class="section-tight">
+  <div class="container-narrow">
+    <div class="panel panel--loose reveal" style="text-align: center; padding: 48px;">
+      <h3>Prefer to start with the research?</h3>
+      <p class="lead mt-12" style="margin-left: auto; margin-right: auto;">Download our 2026 Regulatory Yearbook — no form required.</p>
+      <a class="btn btn-ghost mt-20" href="../resources/2026-predictions.html">Get the yearbook <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="../nav.js"></script>
+</body>
+</html>

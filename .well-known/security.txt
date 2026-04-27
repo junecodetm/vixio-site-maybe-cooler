@@ -1,0 +1,5 @@
+Contact: mailto:security@vixio.com
+Expires: 2027-04-22T00:00:00Z
+Preferred-Languages: en
+Canonical: https://www.vixio.com/.well-known/security.txt
+Policy: https://www.vixio.com/responsible-disclosure

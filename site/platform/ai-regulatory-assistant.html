@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Regulatory Assistant — Ask the corpus, cite the source | Vixio</title>
+<meta name="description" content="A regulatory AI assistant grounded in the Vixio corpus. Ask questions in natural language, get answers cited back to the underlying rule — no hallucinated regulation.">
+<meta name="theme-color" content="#0A0A14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<!-- ============= HERO ============= -->
+<section class="hero">
+  <div class="container-wide">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../../index.html">Home</a> <span>/</span> <a href="./index.html">Platform</a> <span>/</span> <span>AI Regulatory Assistant</span>
+    </nav>
+    <div class="hero-split">
+      <div>
+        <div class="hero-eyebrow-row reveal">
+          <span class="eyebrow">Platform · AI Assistant</span>
+          <span class="chip chip--teal">Source-cited</span>
+        </div>
+        <h1 class="hero-headline reveal">Ask the corpus<br>anything. <em>Cite</em><br>the source.</h1>
+        <p class="hero-lede reveal">A regulatory assistant grounded in Vixio's verified corpus. Every output cites its underlying rule, consultation, or enforcement action — so your team can quote it in front of a regulator.</p>
+        <div class="hero-ctas reveal">
+          <a class="btn btn-primary" data-magnet href="../about/contact.html">Try it live <span class="arr">→</span></a>
+          <a class="btn btn-ghost" href="./index.html">Back to platform</a>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal">
+        <div class="panel-bracket">
+          <div class="panel-head panel-scanline">
+            <div class="panel-head-title"><span class="pulse-dot"></span>Vixio · Assistant</div>
+            <div class="panel-head-meta"><span>SESSION · LIVE</span></div>
+          </div>
+          <div class="panel-body" style="padding: 20px; display: flex; flex-direction: column; gap: 18px;">
+
+            <!-- Question block — visible from start; the data-typing element types its content -->
+            <div data-ai-question>
+              <div class="mono-label" style="margin-bottom: 8px;">You · 04:12</div>
+              <div style="padding: 12px 14px; border-radius: 10px; border: 1px solid var(--hairline); background: rgba(255,255,255,.02); font-size: 13.5px; color: var(--ink-9); line-height: 1.5; min-height: 24px;">
+                <span data-typing="What changed in MiCA this week?" data-typing-speed="14">What changed in MiCA this week?</span>
+              </div>
+            </div>
+
+            <!-- Answer slot — single block that holds BOTH the synth pill
+                 (shown briefly while AI is "thinking") and the answer card.
+                 The synth pill and the answer card occupy the SAME slot in
+                 layout flow, so when the synth disappears the answer fills
+                 in directly under the question (no stacking below an empty
+                 row). data-ai-answer wraps both phases. -->
+            <div data-ai-answer>
+              <!-- Synth phase: "Thinking..." beat, ~500ms before the answer -->
+              <div data-ai-synth style="opacity: 0; transform: translateY(8px); display: none;">
+                <div class="mono-label" style="color: var(--accent-400);"><span class="live-dot live-dot--cyan"></span> Thinking<span data-thinking-dots>...</span></div>
+              </div>
+              <!-- Answer phase: full answer card. data-ai-card pre-hidden via inline opacity 0 so there's no FOUC -->
+              <div data-ai-card style="opacity: 0; transform: translateY(8px); display: none;">
+                <div class="mono-label" style="margin-bottom: 8px; color: var(--accent-400);"><span class="live-dot live-dot--cyan"></span> Vixio · answer</div>
+                <div style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(55, 184, 203,.25); background: rgba(55, 184, 203,.06); font-size: 13.5px; color: var(--ink-9); line-height: 1.55;">
+                  <div style="margin-bottom: 10px;"><strong style="color: var(--ink-10);">This week's MiCA activity:</strong></div>
+                  <div style="margin-bottom: 8px;">• EBA published final RTS on reserve composition for stablecoins (Art. 36) — tighter HQLA thresholds vs draft. <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-300);">[src 1]</span></div>
+                  <div style="margin-bottom: 8px;">• ESMA issued Q&amp;A clarifying Article 59 scope for CASPs. <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-300);">[src 2]</span></div>
+                  <div style="margin-bottom: 14px;">• Joint ESA statement on custody segregation and safeguarding evidence. <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-300);">[src 3]</span></div>
+                  <div style="margin-bottom: 10px;"><strong style="color: var(--ink-10);">Implementation window:</strong> 30 June onward for existing issuers; structural compliance required by year-end. Safeguarding evidence requirements apply on publication.</div>
+                  <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hairline); font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-7); letter-spacing: .12em; text-transform: uppercase;">
+                    Sources · EBA RTS · ESMA Q&amp;A · Joint statement · 3 documents cited
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <p style="margin-top: 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em; color: var(--ink-6); text-transform: uppercase; text-align: right;">Illustrative · Actual outputs cite full primary sources</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= CAPABILITIES ============= -->
+<section class="section bg-ink-grad">
+  <div class="container-wide">
+    <div class="section-head section-head--center reveal">
+      <span class="eyebrow">Three modes</span>
+      <h2 class="mt-16">Ask. Summarise. Compare.</h2>
+    </div>
+
+    <div class="grid-3 mt-56 reveal">
+      <div class="card">
+        <div class="card-kicker">Ask</div>
+        <h3 class="card-title mt-12">Natural-language queries on 4M+ datapoints.</h3>
+        <p class="card-desc">"What AML thresholds apply to PSPs in Germany?" "Does our app fall under MiCA custody rules?" The assistant finds, synthesises, and cites.</p>
+      </div>
+      <div class="card">
+        <div class="card-kicker">Summarise</div>
+        <h3 class="card-title mt-12">Consultation papers in a briefing-ready page.</h3>
+        <p class="card-desc">Point it at any rule, consultation, or enforcement action. Get a structured executive summary in 30 seconds — with every source citeable.</p>
+      </div>
+      <div class="card">
+        <div class="card-kicker">Compare</div>
+        <h3 class="card-title mt-12">Cross-jurisdiction deltas on demand.</h3>
+        <p class="card-desc">"How do MAS, FCA, and BaFin treat crypto custody?" The assistant builds a side-by-side with sourced quotes and a gap analysis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= GUARDED OUTPUT ============= -->
+<section class="section">
+  <div class="container-narrow">
+    <div class="panel panel--loose reveal" style="padding: 44px; border-color: rgba(55, 184, 203,.25);">
+      <span class="eyebrow">Why this is different</span>
+      <h2 class="mt-20">No hallucinated regulation. Ever.</h2>
+      <p class="lead mt-20">The assistant is grounded in Vixio's verified corpus — the same corpus the analyst desk curates. If the answer isn't in the corpus, the assistant says so. If a source can't be cited, the answer isn't returned.</p>
+      <ul class="checks mt-24">
+        <li>Retrieval-augmented on a curated, analyst-validated corpus — not the open web.</li>
+        <li>Source citation on every claim; click-through to the underlying document.</li>
+        <li>Confidence scoring and gap signalling when the corpus is thin on a topic.</li>
+        <li>Enterprise-grade data handling: your prompts aren't used to train public models.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= QUOTE ============= -->
+<section class="section">
+  <div class="container-narrow">
+    <div class="quote reveal" style="padding: 40px;">
+      <blockquote style="font-size: 1.4rem; line-height: 1.4;">It's the first AI tool I've put in front of a partner without a compliance review. The citations are the whole difference — everything it says, we can point to.</blockquote>
+      <cite>Partner · Regulatory group · International law firm · Anonymised</cite>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= CTA ============= -->
+<section class="section">
+  <div class="container">
+    <div class="cta-band reveal">
+      <h2>Try the assistant on your actual regulatory questions.</h2>
+      <p class="lead">Bring three questions your team is stuck on. We'll answer them live — with citations.</p>
+      <div class="hero-ctas" style="justify-content: center;">
+        <a class="btn btn-primary" href="../about/contact.html">Book a live session <span class="arr">→</span></a>
+        <a class="btn btn-outline-light" href="./index.html">Back to platform</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="../nav.js"></script>
+</body>
+</html>
