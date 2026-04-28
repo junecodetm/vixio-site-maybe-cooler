@@ -160,7 +160,6 @@
           .attr('r', 22).attr('opacity', 0).remove();
       }
       flashRandom();
-      setInterval(flashRandom, 1400);
     }).catch(function (err) {
       if (window.console) console.warn('[Vixio] miniMap topo load failed', err);
     });

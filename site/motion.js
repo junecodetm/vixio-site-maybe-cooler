@@ -296,7 +296,6 @@
       idx = (idx + 1) % rows.length;
     }
     paintBatch();
-    setInterval(paintBatch, 6500);
   }
 
   function runTypingDemos() {
@@ -737,7 +736,7 @@
     rows.forEach(function (r) { r.classList.remove('dash-fresh-row'); });
 
     var lastIdx = -1;
-    var iv = null;
+    var played = false;
     function nextScan() {
       rows.forEach(function (r) { r.classList.remove('dash-scan-active'); });
       var idx;
@@ -750,24 +749,13 @@
       t.classList.add('dash-scan-active');
     }
     function start() {
-      if (iv) return;
+      if (played) return;
+      played = true;
       nextScan();
-      iv = setInterval(nextScan, 5000);
-    }
-    function stop() {
-      if (!iv) return;
-      clearInterval(iv); iv = null;
     }
     var trigger = rows[0].closest('.panel-bracket, .dashboard-inner');
     if (!trigger) return;
-    // Start immediately if already in viewport on load
     fireWhenInView(trigger, start, 600);
-    // Pause/resume on scroll boundaries
-    ScrollTrigger.create({
-      trigger: trigger, start: 'top 88%', end: 'bottom 12%',
-      onLeave: stop, onLeaveBack: stop,
-      onEnterBack: start
-    });
   }
 
   // 2. LIBRARY SEARCH — type "stablecoin reserve requirements", results pop in
@@ -799,10 +787,12 @@
     var results = resultsGrid ? Array.prototype.slice.call(resultsGrid.children) : [];
     results.forEach(function (r) { gsap.set(r, { opacity: 0, y: 10 }); });
 
-    var iv = null, isPlaying = false;
+    var isPlaying = false;
+    var hasPlayed = false;
     function play() {
-      if (isPlaying) return;
+      if (isPlaying || hasPlayed) return;
       isPlaying = true;
+      hasPlayed = true;
       queryText.textContent = '';
       results.forEach(function (r) { gsap.set(r, { opacity: 0, y: 10 }); });
       queryText.classList.add('dash-typing-cursor');
@@ -816,8 +806,7 @@
             results.forEach(function (r, idx) {
               gsap.to(r, { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out', delay: idx * 0.18, overwrite: false });
             });
-            // Restart loop after 7s
-            setTimeout(function () { isPlaying = false; play(); }, 7000 + results.length * 180);
+            isPlaying = false;
           }, 600);
         }
       }, 55);
@@ -887,9 +876,11 @@
       return tl;
     }
     var tl = buildTimeline();
+    var played = false;
     function play() {
+      if (played) return;
+      played = true;
       tl.restart();
-      setTimeout(play, (tl.duration() + 6) * 1000);
     }
     fireWhenInView(dash.closest('.dashboard') || dash, play, 500);
   }
@@ -909,7 +900,10 @@
       it.classList.remove('done', 'active');
     });
 
+    var played = false;
     function play() {
+      if (played) return;
+      played = true;
       items.forEach(function (it) { it.classList.remove('done', 'active', 'dash-check-pulse'); });
       items.forEach(function (it, i) {
         setTimeout(function () {
@@ -927,8 +921,6 @@
           }
         }, 700 + i * 380);
       });
-      var total = 700 + items.length * 380 + 4000;
-      setTimeout(play, total);
     }
     fireWhenInView(pb.closest('.panel-bracket'), play, 600);
   }
@@ -988,7 +980,10 @@
       return baseDelay + matched.length * perCellStagger;
     }
 
+    var played = false;
     function play() {
+      if (played) return;
+      played = true;
       cells.forEach(function (c) {
         c.setAttribute('style', (c.dataset.origStyle || '').replace(/background\s*:\s*#[0-9A-Fa-f]+\s*;?/, 'background: rgba(255,255,255,.05);'));
         c.classList.remove('dash-cell-pop');
@@ -1009,8 +1004,6 @@
           gapCallout.classList.add('dash-tile-popin');
         }, t + 400);
       }
-      // Hold then loop (cells stay lit, callout stays visible, then reset)
-      setTimeout(play, t + 6500);
     }
     fireWhenInView(dash.closest('.dashboard') || dash, play, 400);
   }
@@ -1260,7 +1253,10 @@
       Array.prototype.forEach.call(ripples, function (r) { r.remove(); });
     }
 
+    var played = false;
     function play() {
+      if (played) return;
+      played = true;
       clearPending();
       reset();
 
@@ -1292,9 +1288,6 @@
         }, 180);
       }, downloadClickAtMs);
 
-      // Loop after the file has been visible for ~4.5s.
-      var totalCycleMs = downloadClickAtMs + 180 + 900 + 4500;
-      later(play, totalCycleMs);
     }
     fireWhenInView(dash.closest('.dashboard') || dash, play, 600);
   }

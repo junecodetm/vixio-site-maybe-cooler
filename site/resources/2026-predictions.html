@@ -2007,9 +2007,11 @@
       if (prefersReduce) return;
 
       var start = performance.now();
+      var orbitElapsed = 0;
       function loop(now) {
-        placeTags(stage, tags, now - start, stageW);
-        requestAnimationFrame(loop);
+        orbitElapsed = Math.min(now - start, orbitalPeriodMs);
+        placeTags(stage, tags, orbitElapsed, stageW);
+        if (orbitElapsed < orbitalPeriodMs) requestAnimationFrame(loop);
       }
       requestAnimationFrame(loop);
       var resizeRaf = null;
@@ -2018,7 +2020,7 @@
         resizeRaf = requestAnimationFrame(function () {
           resizeRaf = null;
           stageW = stage.offsetWidth;
-          placeTags(stage, tags, performance.now() - start, stageW);
+          placeTags(stage, tags, orbitElapsed, stageW);
         });
       });
 

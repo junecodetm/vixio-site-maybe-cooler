@@ -1607,7 +1607,13 @@
 }
 .site-header .nav-link:hover::after { transform: scaleX(1); }
 
-/* ============ J. REDUCED MOTION ============ */
+/* ============ J. ONE-SHOT MOTION POLICY ============ */
+/* Animated layer loads after styles.css, so repeat the one-shot rule here. */
+*, *::before, *::after {
+  animation-iteration-count: 1 !important;
+}
+
+/* ============ K. REDUCED MOTION ============ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

@@ -3222,8 +3222,13 @@ body > .container:has(> .breadcrumb):has(+ .hero-industry) + .hero-industry {
 
 
 /* =========================================================================
-   24 — PRINT + PREFERS-REDUCED-MOTION
+   24 — ONE-SHOT MOTION + PREFERS-REDUCED-MOTION
    ========================================================================= */
+/* Let animations appear, but prevent idle loops across the static site. */
+*, *::before, *::after {
+  animation-iteration-count: 1 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important;
