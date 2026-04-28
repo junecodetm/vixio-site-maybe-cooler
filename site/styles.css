@@ -3045,6 +3045,70 @@ body > .container:has(> .breadcrumb):has(+ .hero-industry) + .hero-industry {
   border-radius: 50%;
 }
 
+/* =========================================================================
+   EAB tabs — light-theme overrides for pillar-tabs on the Advisory Board page
+   Reuses the existing setupPillarTabs() JS in nav.js; only the visuals change.
+   ========================================================================= */
+.eab-tabs-light .pillar-tabs {
+  background: rgba(255, 255, 255, .85);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 5px;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 8px 24px -16px rgba(15, 23, 42, .12);
+}
+.eab-tabs-light .pillar-tab {
+  padding: 11px 22px;
+  border-radius: 999px;
+  color: var(--text-3);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: .005em;
+}
+.eab-tabs-light .pillar-tab:hover { color: var(--text-1); background: rgba(15, 23, 42, .04); }
+.eab-tabs-light .pillar-tab .tab-idx {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  color: var(--ink-5);
+}
+.eab-tabs-light .pillar-tab[aria-selected="true"] {
+  background: linear-gradient(135deg, var(--brand-600), var(--accent-600));
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px -4px rgba(35, 52, 133, .35);
+}
+.eab-tabs-light .pillar-tab[aria-selected="true"] .tab-idx { color: rgba(255, 255, 255, .75); }
+
+.eab-tabs-light .pillar-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 36px;
+  min-height: auto;
+  overflow: visible;
+  animation: eabFadeIn .35s ease both;
+}
+.eab-tabs-light .pillar-panel::before { display: none; }
+.eab-tabs-light .pillar-panel[hidden] { display: none; }
+
+@keyframes eabFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eab-tabs-light .pillar-panel { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .eab-tabs-light .pillar-tabs { width: 100%; }
+  .eab-tabs-light .pillar-tab { flex: 1; padding: 10px 12px; font-size: 12.5px; }
+}
+
 /* Legacy separator pips — render as a tiny dot, hide any text content */
 .sep {
   display: inline-block;
