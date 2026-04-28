@@ -26,6 +26,15 @@
     // compute parent of siteRoot (i.e. the directory one level above /site/)
     return siteRoot.replace(/\/site\/?$/, '/').replace(/\/site\/$/, '/');
   })();
+  const animatedAssetQuery = (function () {
+    if (!scriptEl) return '';
+    try {
+      const u = new URL(scriptEl.getAttribute('src') || '', window.location.href);
+      return u.search || '';
+    } catch (e) {
+      return '';
+    }
+  })();
 
   // -----------------------------------------------------------------------
   // ANIMATED ASSET LOADER — injects animated.css + GSAP + motion.js + dashboard.js
@@ -57,7 +66,7 @@
       });
     }
 
-    injectStyle(siteRoot + 'animated.css');
+    injectStyle(siteRoot + 'animated.css' + animatedAssetQuery);
 
     // Load GSAP stack, then motion.js. SplitText is optional — if its CDN copy is
     // unavailable (some CDNs block the redistribution), motion.js falls back to a
@@ -74,7 +83,7 @@
           });
         });
       })
-      .then(function () { return injectScript(siteRoot + 'motion.js'); })
+      .then(function () { return injectScript(siteRoot + 'motion.js' + animatedAssetQuery); })
       .catch(function (err) { console.warn('[Vixio] motion script load failed', err); });
 
     // Lazy-load D3 + dashboard.js when the page actually uses a map widget

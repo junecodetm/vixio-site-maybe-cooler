@@ -3397,6 +3397,30 @@ body > .container:has(> .breadcrumb):has(+ .hero-industry) + .hero-industry {
   animation-iteration-count: 1 !important;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  body[data-continuous-motion] .pulse-dot,
+  body[data-continuous-motion] .eyebrow::before,
+  body[data-continuous-motion] .nav-status::before,
+  body[data-continuous-motion] .panel-scanline::after,
+  body[data-continuous-motion] .dash-pulse-radar,
+  body[data-continuous-motion] .dash-live-flicker,
+  body[data-continuous-motion] .dash-fresh-row,
+  body[data-continuous-motion] .live-dot,
+  body[data-continuous-motion] .scanner::before,
+  body[data-continuous-motion] .typing-cursor::after,
+  body[data-continuous-motion] .dash-typing-cursor::after,
+  body[data-continuous-motion] .gradient-mesh::before,
+  body[data-continuous-motion] .cmd-bar::after,
+  body[data-continuous-motion] .cmd-bar .cmd-dot,
+  body[data-continuous-motion] .cmd-bar .cmd-cursor,
+  body[data-continuous-motion] .worldmap .pin,
+  body[data-continuous-motion] .ticker-track,
+  body[data-continuous-motion] .logo-marquee-track,
+  body[data-continuous-motion] .marquee-track {
+    animation-iteration-count: infinite !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .001ms !important;

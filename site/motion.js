@@ -737,6 +737,8 @@
 
     var lastIdx = -1;
     var played = false;
+    var timer = null;
+    var continuous = document.body && document.body.hasAttribute('data-continuous-motion');
     function nextScan() {
       rows.forEach(function (r) { r.classList.remove('dash-scan-active'); });
       var idx;
@@ -749,12 +751,38 @@
       t.classList.add('dash-scan-active');
     }
     function start() {
-      if (played) return;
+      if (!continuous && played) return;
       played = true;
+      if (continuous && timer) return;
       nextScan();
+      if (continuous) timer = setInterval(nextScan, 4200);
+    }
+    function stop() {
+      if (!timer) return;
+      clearInterval(timer);
+      timer = null;
+      rows.forEach(function (r) { r.classList.remove('dash-scan-active'); });
+    }
+    function inView(el) {
+      var r = el.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
     }
     var trigger = rows[0].closest('.panel-bracket, .dashboard-inner');
     if (!trigger) return;
+    if (continuous) {
+      if (inView(trigger)) setTimeout(start, 600);
+      ScrollTrigger.create({
+        trigger: trigger,
+        start: 'top bottom',
+        end: 'bottom top',
+        onEnter: start,
+        onEnterBack: start,
+        onLeave: stop,
+        onLeaveBack: stop
+      });
+      window.addEventListener('pagehide', stop);
+      return;
+    }
     fireWhenInView(trigger, start, 600);
   }
 
